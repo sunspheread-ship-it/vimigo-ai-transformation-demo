@@ -40,7 +40,7 @@ test("reports are described as case-generated drafts, not fixed sample PDFs", ()
 });
 
 test("continue validates the visible form and saved model", () => {
-  assert.match(appSource, /activeForm\.reportValidity\(\)/);
+  assert.match(appSource, /activeForm\.querySelectorAll\("\[required\]"\)/);
   assert.match(appSource, /!visibleFormIsValid \|\| !validate\(state\.activeStep\)/);
 });
 

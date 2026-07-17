@@ -737,7 +737,13 @@ app.addEventListener("click", (event) => {
   const next = event.target.closest("[data-continue]")?.dataset.continue;
   if (next) {
     const activeForm = event.target.closest("form");
-    const visibleFormIsValid = activeForm ? activeForm.reportValidity() : true;
+    const visibleFormIsValid = activeForm
+      ? [...activeForm.querySelectorAll("[required]")].every((field) =>
+          field.type === "checkbox"
+            ? field.checked
+            : String(field.value ?? "").trim(),
+        )
+      : true;
     if (!visibleFormIsValid || !validate(state.activeStep)) {
       validationError = tr("required");
       render();
