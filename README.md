@@ -6,7 +6,7 @@ The Google Apps Script pilot for real client cases, CSM review, AI-assisted draf
 
 ## Public demonstration
 
-The public demo is plain HTML, CSS and JavaScript with no build step. It includes bilingual forms, transparent scoring, evidence confidence, local save-and-resume, mobile layouts and six separate print-ready report previews.
+The public demo is plain HTML, CSS and JavaScript with no build step. It includes bilingual forms, transparent scoring, guided 1-5 rating anchors, local save-and-resume, mobile layouts and six separate print-ready report previews.
 
 Run `npm test` to verify the scoring rules. Serve the repository root over HTTP for local browser testing.
 

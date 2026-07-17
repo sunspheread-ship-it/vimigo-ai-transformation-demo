@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateEvidenceConfidence, calculateScore, estimateRevenueOpportunity, getStage, normaliseRating } from "../src/scoring.js";
+import { calculateScore, estimateRevenueOpportunity, getStage, normaliseRating } from "../src/scoring.js";
 
 test("ratings are bounded between 1 and 5", () => {
   assert.equal(normaliseRating(0), 1);
@@ -20,13 +20,6 @@ test("stage boundaries match the approved bands", () => {
   assert.equal(getStage(60), "performance");
   assert.equal(getStage(75), "data");
   assert.equal(getStage(90), "ai");
-});
-
-test("evidence confidence thresholds are exact", () => {
-  const filled = (count, total = 10) => Array.from({ length: total }, (_, index) => index < count ? { note: "Evidence" } : { note: "" });
-  assert.equal(calculateEvidenceConfidence(filled(4)).level, "low");
-  assert.equal(calculateEvidenceConfidence(filled(5)).level, "medium");
-  assert.equal(calculateEvidenceConfidence(filled(8)).level, "high");
 });
 
 test("financial opportunity is withheld without sufficient client baselines", () => {

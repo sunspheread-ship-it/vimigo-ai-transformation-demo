@@ -32,18 +32,6 @@ export function getStage(score) {
   return STAGE_BANDS.find((band) => numeric >= band.min)?.key || "boss";
 }
 
-export function calculateEvidenceConfidence(evidenceItems) {
-  const items = Array.isArray(evidenceItems) ? evidenceItems : [];
-  const supplied = items.filter((item) => String(item?.note || item?.source || "").trim()).length;
-  const percentage = items.length ? Math.round((supplied / items.length) * 100) : 0;
-  return {
-    supplied,
-    total: items.length,
-    percentage,
-    level: percentage >= 80 ? "high" : percentage >= 50 ? "medium" : "low",
-  };
-}
-
 export function canQuantifyImpact(metrics = {}) {
   const required = ["monthlyVolume", "conversionRate", "averageValue"];
   return required.every((key) => Number(metrics[key]) > 0);

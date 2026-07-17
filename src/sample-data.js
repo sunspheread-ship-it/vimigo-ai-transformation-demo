@@ -24,21 +24,6 @@ export const initialState = {
   diagnostic: {
     stageRatings: [2, 4, 2, 2, 1],
     osRatings: { direction: 4, performance: 3, money: 4, reward: 2, talent: 3, aiExecution: 3 },
-    stageEvidence: [
-      { note: "Owner still resolves cross-branch exceptions.", source: "Workshop interview" },
-      { note: "Core SOPs exist for reception and appointments.", source: "SOP index" },
-      { note: "KPIs are reviewed but rewards are not consistently linked.", source: "Weekly tracker" },
-      { note: "Reports are consolidated weekly, not daily.", source: "Google Sheet" },
-      { note: "ChatGPT is used individually; no governed workflow exists.", source: "Participant interview" },
-    ],
-    osEvidence: {
-      direction: { note: "12-month direction is stated and understood by management.", source: "Management plan" },
-      performance: { note: "Branch KPIs exist but accountability varies.", source: "KPI tracker" },
-      money: { note: "Lead, appointment and treatment value are measured.", source: "Sales report" },
-      reward: { note: "Recognition is informal and not tied to weekly actions.", source: "Interview" },
-      talent: { note: "Branch roles exist; development paths are incomplete.", source: "Organisation chart" },
-      aiExecution: { note: "Three candidate workflows identified; none deployed.", source: "Workshop notes" },
-    },
     bottlenecks: [
       { issue: "Slow WhatsApp lead response", impact: "Prospects move to competitors", trigger: "A new WhatsApp enquiry is received", inputs: "Enquiry text, branch, service requested, operating hours and approved reply rules", aiTask: "Classify intent, summarise the enquiry and draft the next approved response", humanApproval: "Customer Care Lead approves sensitive, unusual or high-value replies", owner: "Customer Care Lead", exceptions: "Clinical advice, complaints, refunds and messages with unclear consent route to a human", metric: "Median first-response time and lead assignment rate", readiness: "Medium - message data exists but routing rules need standardisation", risk: "Incorrect or inappropriate customer-facing reply" },
       { issue: "Weak appointment confirmation", impact: "Chair capacity and revenue are lost", trigger: "An appointment reaches the 48-hour and 24-hour confirmation windows", inputs: "Appointment time, branch, patient contact preference and approved reminder template", aiTask: "Prepare reminder and confirmation follow-up tasks using approved templates", humanApproval: "Clinic Manager approves rescheduling, complaints and special-care cases", owner: "Clinic Manager", exceptions: "Medical questions, repeated no-response and rescheduling conflicts route to staff", metric: "Confirmation completion rate and no-show rate", readiness: "Medium - appointment data exists but consent and exception rules require review", risk: "Privacy, consent or incorrect appointment information" },

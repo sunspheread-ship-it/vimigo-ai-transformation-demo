@@ -31,3 +31,17 @@ test("public demo does not claim that a CSM was notified", () => {
   assert.match(appSource, /the CSM was not notified/);
   assert.doesNotMatch(appSource, /Submission confirmed for CSM review/);
 });
+
+test("diagnostic ratings do not ask for repeated evidence notes or sources", () => {
+  const ratingSection = appSource.slice(
+    appSource.indexOf("function ratingRow"),
+    appSource.indexOf("function workflowCandidateForm"),
+  );
+  assert.doesNotMatch(ratingSection, /evidence-fields|evidencePath|Evidence note/);
+  assert.doesNotMatch(reportsSource, /Evidence note|Evidence confidence/);
+});
+
+test("header uses the official Vimigo website logo asset", () => {
+  assert.match(appSource, /vimigo\.io\/wp-content\/uploads\/2025\/10\/Logo\.png/);
+  assert.match(appSource, /alt="Vimigo"/);
+});
