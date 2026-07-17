@@ -622,6 +622,112 @@ function render() {
   };
   app.innerHTML = layout(screens[state.activeStep]());
 }
+
+function safeFileName(value, fallback = "Vimigo report") {
+  const cleaned = String(value || fallback)
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-")
+    .replace(/\s+/g, " ")
+    .replace(/[. ]+$/g, "")
+    .trim();
+  return (cleaned || fallback).slice(0, 100);
+}
+
+async function downloadAllReportPdfs(button) {
+  const status = app.querySelector("[data-download-status]");
+  const originalLabel = button.textContent;
+  let stage;
+
+  const setStatus = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  try {
+    if (!window.html2pdf || !window.JSZip) {
+      throw new Error("The PDF generator did not load. Please refresh and try again.");
+    }
+
+    const reports = [...app.querySelectorAll("[data-report]")];
+    if (reports.length !== 6) {
+      throw new Error(`Expected six reports but found ${reports.length}.`);
+    }
+
+    button.disabled = true;
+    const zip = new window.JSZip();
+    const company = safeFileName(state.pre.company, "Client company");
+
+    for (let index = 0; index < reports.length; index += 1) {
+      const report = reports[index];
+      const number = String(index + 1).padStart(2, "0");
+      const title = safeFileName(
+        report.querySelector(".report-head h2")?.textContent,
+        `Report ${number}`,
+      );
+
+      button.textContent = `Creating PDF ${index + 1} / 6...`;
+      setStatus(`Preparing ${number} - ${title}`);
+
+      stage = document.createElement("div");
+      stage.className = "pdf-export-stage";
+      const clone = report.cloneNode(true);
+      clone.removeAttribute("id");
+      clone.querySelectorAll("button").forEach((item) => item.remove());
+      stage.append(clone);
+      document.body.append(stage);
+
+      const pdfBlob = await window
+        .html2pdf()
+        .set({
+          margin: [7, 7, 9, 7],
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            logging: false,
+          },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: {
+            mode: ["css", "legacy"],
+            avoid: [
+              ".report-head",
+              ".report-meta",
+              ".finding-grid > div",
+              ".priority-list section",
+              ".workflow-detail",
+              ".decision-box",
+              "tr",
+            ],
+          },
+        })
+        .from(clone)
+        .outputPdf("blob");
+
+      zip.file(`${number} - ${title} - ${company}.pdf`, pdfBlob);
+      stage.remove();
+      stage = null;
+    }
+
+    button.textContent = "Packaging 6 PDFs...";
+    setStatus("Packaging six separate PDF files into one ZIP...");
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const downloadUrl = URL.createObjectURL(zipBlob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = `Vimigo - Six Reports - ${company}.zip`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+    setStatus("Complete: your ZIP contains six separate PDF files.");
+  } catch (error) {
+    console.error(error);
+    setStatus(`Download failed: ${error.message}`);
+  } finally {
+    if (stage) stage.remove();
+    button.disabled = false;
+    button.textContent = originalLabel;
+  }
+}
 function validate(step) {
   const workflowFields = [
     "issue",
@@ -705,6 +811,11 @@ app.addEventListener("change", (event) => {
     render();
 });
 app.addEventListener("click", (event) => {
+  const downloadAllButton = event.target.closest("[data-download-all]");
+  if (downloadAllButton) {
+    downloadAllReportPdfs(downloadAllButton);
+    return;
+  }
   const lang = event.target.closest("[data-lang]")?.dataset.lang;
   if (lang) {
     state.language = lang;

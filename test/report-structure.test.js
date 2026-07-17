@@ -64,3 +64,13 @@ test("hero score ring keeps a perfect square aspect ratio", () => {
   assert.match(stylesSource, /\.score-orbit\s*\{[^}]*aspect-ratio:\s*1\s*\/\s*1/s);
   assert.doesNotMatch(stylesSource, /\.score-orbit\s*\{[^}]*min-height:/s);
 });
+
+test("complete report pack exports six separate PDFs in one ZIP", () => {
+  assert.match(reportsSource, /data-download-all/);
+  assert.match(reportsSource, /six separately named PDF files/);
+  assert.match(appSource, /reports\.length !== 6/);
+  assert.match(appSource, /outputPdf\("blob"\)/);
+  assert.match(appSource, /new window\.JSZip\(\)/);
+  assert.match(appSource, /zip\.file\(`/);
+  assert.match(appSource, /generateAsync\(\{ type: "blob" \}\)/);
+});

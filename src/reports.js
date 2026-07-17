@@ -382,5 +382,20 @@ export function buildDetailedReports(ctx) {
     "Six personalised consulting drafts generated from the form answers in this case. Final PDFs are exported only after CSM review and approval.",
     "六份详细顾问报告草稿。每份报告包含证据、分析、行动、负责人、指标和批准关卡。 ",
   );
-  return `<section class="reports-shell"><header class="screen-header"><span>04</span><div><p>VIMIGO AI TRANSFORMATION DAY</p><h1>${r(language, "Six Detailed Reports", "六份详细报告")}</h1><small>${intro}</small></div></header>${ctx.state.submitted ? `<div class="confirmation">✓ ${ctx.t("confirmed")}</div>` : ""}<div class="report-index">${reports.map((_, i) => `<a href="#report-${i + 1}">0${i + 1}</a>`).join("")}</div>${reports.map((report, i) => report.replace('class="report-sheet', `id="report-${i + 1}" class="report-sheet`)).join("")}<div class="submit-bar"><div><b>${ctx.state.submitted ? ctx.t("confirmed") : r(language, "PUBLIC DEMO - LOCAL SAVE ONLY", "公开示范 - 仅本机保存")}</b><p>${r(language, "This GitHub demo does not transmit client data or notify a CSM. Use the private pilot link for real submissions.", "此 GitHub 示范不会传送客户资料，也不会通知 CSM。真实提交必须使用私人试点链接。")}</p></div><button class="primary" data-submit ${ctx.state.submitted ? "disabled" : ""}>${ctx.t("submit")}</button></div></section>`;
+  const downloadTitle = r(
+    language,
+    "Download the complete six-file report pack",
+    "下载完整六份报告",
+  );
+  const downloadHelp = r(
+    language,
+    "One ZIP download containing six separately named PDF files (01-06).",
+    "一次下载 ZIP 压缩包，内含六份独立命名的 PDF（01-06）。",
+  );
+  const downloadLabel = r(
+    language,
+    "Download all 6 PDFs (.zip)",
+    "下载全部 6 份 PDF（ZIP）",
+  );
+  return `<section class="reports-shell"><header class="screen-header"><span>04</span><div><p>VIMIGO AI TRANSFORMATION DAY</p><h1>${r(language, "Six Detailed Reports", "六份详细报告")}</h1><small>${intro}</small></div></header>${ctx.state.submitted ? `<div class="confirmation">✓ ${ctx.t("confirmed")}</div>` : ""}<div class="report-index">${reports.map((_, i) => `<a href="#report-${i + 1}">0${i + 1}</a>`).join("")}</div><div class="download-pack"><div><b>${downloadTitle}</b><p>${downloadHelp}</p><small data-download-status aria-live="polite"></small></div><button type="button" class="primary" data-download-all>${downloadLabel}</button></div>${reports.map((report, i) => report.replace('class="report-sheet', `id="report-${i + 1}" class="report-sheet`)).join("")}<div class="submit-bar"><div><b>${ctx.state.submitted ? ctx.t("confirmed") : r(language, "PUBLIC DEMO - LOCAL SAVE ONLY", "公开示范 - 仅本机保存")}</b><p>${r(language, "This GitHub demo does not transmit client data or notify a CSM. Use the private pilot link for real submissions.", "此 GitHub 示范不会传送客户资料，也不会通知 CSM。真实提交必须使用私人试点链接。")}</p></div><button class="primary" data-submit ${ctx.state.submitted ? "disabled" : ""}>${ctx.t("submit")}</button></div></section>`;
 }

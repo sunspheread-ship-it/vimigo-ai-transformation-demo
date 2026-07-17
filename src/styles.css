@@ -518,6 +518,30 @@ form {
   text-decoration: none;
   font-weight: 800;
 }
+.download-pack {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 0 0 24px;
+  padding: 20px;
+  border: 1px solid var(--cyan);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #0a2038, #0b2944);
+}
+.download-pack p {
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+.download-pack small {
+  display: block;
+  min-height: 18px;
+  margin-top: 8px;
+  color: var(--green);
+}
+.download-pack .primary {
+  flex: 0 0 auto;
+}
 .report-sheet {
   padding: 32px;
   margin: 0 0 30px;
@@ -900,6 +924,13 @@ form {
     padding: 8px 0;
     overflow-x: auto;
   }
+  .download-pack {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .download-pack .primary {
+    width: 100%;
+  }
   .os-bars > div {
     grid-template-columns: 1fr 38px;
   }
@@ -924,6 +955,7 @@ form {
   .site-footer,
   .screen-header,
   .report-index,
+  .download-pack,
   .submit-bar,
   .confirmation {
     display: none !important;
@@ -999,4 +1031,102 @@ form {
   .timeline {
     grid-template-columns: repeat(4, 1fr);
   }
+}
+
+.pdf-export-stage {
+  position: fixed;
+  left: -100000px;
+  top: 0;
+  width: 760px;
+  z-index: -1;
+  background: #fff;
+  color: #172033;
+}
+.pdf-export-stage .report-sheet {
+  display: block;
+  width: 760px;
+  min-height: 0;
+  margin: 0;
+  padding: 28px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #172033;
+  box-shadow: none;
+  font-size: 12px;
+}
+.pdf-export-stage .report-head,
+.pdf-export-stage .report-section-head,
+.pdf-export-stage .report-footer {
+  border-color: #ccd6df;
+}
+.pdf-export-stage .report-head h2,
+.pdf-export-stage .report-meta b,
+.pdf-export-stage .detail-table td b,
+.pdf-export-stage .finding-grid b,
+.pdf-export-stage .priority-list b,
+.pdf-export-stage .workflow-detail h3,
+.pdf-export-stage .decision-box b {
+  color: #172033;
+}
+.pdf-export-stage .report-head p,
+.pdf-export-stage .report-head small,
+.pdf-export-stage .source-legend,
+.pdf-export-stage .report-meta span,
+.pdf-export-stage .report-section-head p,
+.pdf-export-stage .finding-grid small,
+.pdf-export-stage .finding-grid em,
+.pdf-export-stage .finding-grid p,
+.pdf-export-stage .priority-list p,
+.pdf-export-stage .workflow-detail header p,
+.pdf-export-stage .workflow-detail header small,
+.pdf-export-stage .method p,
+.pdf-export-stage .mechanism p,
+.pdf-export-stage .stage-banner p,
+.pdf-export-stage .financial p,
+.pdf-export-stage .timeline p,
+.pdf-export-stage .primary-route p,
+.pdf-export-stage .decision-box p,
+.pdf-export-stage .decision-box li,
+.pdf-export-stage .detail-table td,
+.pdf-export-stage .report-footer,
+.pdf-export-stage li {
+  color: #526171;
+}
+.pdf-export-stage .report-meta,
+.pdf-export-stage .finding-grid > div,
+.pdf-export-stage .priority-list section,
+.pdf-export-stage .mechanism-chain > div,
+.pdf-export-stage .workflow-detail,
+.pdf-export-stage .workflow-assessment > div,
+.pdf-export-stage .dependency-grid > div,
+.pdf-export-stage .requirement-list li,
+.pdf-export-stage .decision-box,
+.pdf-export-stage .breakdown p,
+.pdf-export-stage .method,
+.pdf-export-stage .mechanism,
+.pdf-export-stage .stage-banner,
+.pdf-export-stage .target-card,
+.pdf-export-stage .primary-route,
+.pdf-export-stage .financial,
+.pdf-export-stage .three-cards section,
+.pdf-export-stage .workflow-reports section,
+.pdf-export-stage .timeline section {
+  background: #f4f7fa;
+  border-color: #d6e0e8;
+}
+.pdf-export-stage .detail-table-wrap {
+  overflow: visible;
+  border-color: #ccd6df;
+}
+.pdf-export-stage .detail-table {
+  min-width: 0;
+  font-size: 10px;
+}
+.pdf-export-stage .detail-table th {
+  background: #e8eef4;
+  color: #172033;
+}
+.pdf-export-stage .detail-table td {
+  border-color: #d6e0e8;
 }
