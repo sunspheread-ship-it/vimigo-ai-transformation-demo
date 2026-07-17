@@ -67,6 +67,43 @@ const labels = {
   },
 };
 
+const assessmentGuidance = {
+  stages: {
+    en: [
+      { title: "Owner dependence", description: "How much daily progress, decisions and problem-solving still depend on the owner personally.", one: "The business slows or stops without the owner.", three: "Managers handle routine work, but the owner still rescues important issues.", five: "The team runs through clear authority, ownership and escalation rules." },
+      { title: "Process and SOP clarity", description: "How clearly important work is documented, understood and followed across the company.", one: "Work depends on memory and individual habits.", three: "Some SOPs exist, but adoption and ownership are inconsistent.", five: "Critical SOPs are clear, used, owned and regularly improved." },
+      { title: "KPI-action-owner-reward linkage", description: "Whether every important result is connected to measurable actions, an accountable owner and a fair consequence or reward.", one: "KPIs, actions, ownership and rewards are disconnected.", three: "The links exist in some teams but are not reviewed consistently.", five: "Results, actions, owners and rewards are visibly linked and reviewed." },
+      { title: "Timely management data", description: "Whether leaders receive reliable information early enough to make decisions and correct performance.", one: "Data is late, incomplete or disputed.", three: "Reports exist but require manual work and arrive periodically.", five: "Decision-ready data is reliable, timely and used in management reviews." },
+      { title: "Governed AI workflows", description: "Whether AI-assisted work has approved data, clear human decisions, accountable owners, exception handling and audit evidence.", one: "AI use is absent or ad hoc with no controls.", three: "Pilots exist, but controls and ownership are only partly defined.", five: "AI workflows are governed, measured and operated with human approval." },
+    ],
+    zh: [
+      { title: "老板依赖程度", description: "公司日常推进、决策和解决问题，有多少仍必须由老板本人处理。", one: "老板不在，公司就放慢或停下来。", three: "主管可处理日常工作，但重要问题仍要老板救火。", five: "团队依据清楚的权限、责任和升级机制独立运作。" },
+      { title: "流程与 SOP 清晰度", description: "关键工作是否被清楚记录、理解，并在公司内一致执行。", one: "工作依靠个人记忆和习惯。", three: "已有部分 SOP，但执行与责任人并不一致。", five: "关键 SOP 清楚、被采用、有负责人并持续改善。" },
+      { title: "KPI、行动、负责人和奖励连接", description: "每个重要结果是否连接到可衡量行动、明确负责人，以及公平的结果或奖励。", one: "KPI、行动、责任和奖励彼此分开。", three: "部分团队已连接，但没有稳定复盘。", five: "结果、行动、负责人和奖励透明连接并定期复盘。" },
+      { title: "管理数据及时性", description: "管理层能否及时取得可靠资料，用来决策和纠正表现。", one: "资料延迟、不完整或经常有争议。", three: "已有报告，但依赖人工整理并只在特定周期出现。", five: "资料可靠、及时，并真正用于管理复盘和决策。" },
+      { title: "受治理的 AI 工作流程", description: "AI 工作是否具备获准数据、人工决策点、责任人、异常处理和审计证据。", one: "没有 AI，或只是零散使用且没有管控。", three: "已有试点，但管控和责任只定义了一部分。", five: "AI 流程有治理、可衡量，并保留人工批准。" },
+    ],
+  },
+  os: {
+    en: {
+      direction: { title: "Direction OS", description: "Where exactly is the company going in the next 12 months, and what must be achieved in the next 90 days?", one: "Direction is unclear or exists only in the owner's head.", three: "Leaders know the direction, but team alignment and measures are uneven.", five: "Direction is measurable, cascaded into 90-day priorities and reviewed." },
+      performance: { title: "Performance OS", description: "How does the team convert goals into habits, key actions, results and accountability?", one: "Goals, actions and owners are not managed consistently.", three: "KPIs exist, but weekly execution and follow-through are uneven.", five: "Goals drive owned weekly actions, visible results and corrective reviews." },
+      money: { title: "Money OS", description: "Which actions truly affect revenue, margin, cash flow or operating cost?", one: "Commercial drivers are unknown or not measured.", three: "Financial numbers exist, but actions are weakly linked to outcomes.", five: "Key money drivers have baselines, owners, targets and regular reviews." },
+      reward: { title: "Reward OS", description: "What does an employee receive after achieving the agreed result, and is the rule transparent and fair?", one: "Rewards are unclear, subjective or disconnected from results.", three: "Some rewards are linked, but rules or consistency are incomplete.", five: "Rewards and recognition are transparent, fair and linked to results." },
+      talent: { title: "Talent OS", description: "Who owns the work, who fits each role, and who needs development?", one: "Roles, ownership and capability gaps are unclear.", three: "Roles exist, but fit, ownership or development is uneven.", five: "Role fit, accountable ownership and development priorities are clear." },
+      aiExecution: { title: "AI Execution OS", description: "What should AI do, what must remain human-owned, and how will exceptions and results be controlled?", one: "AI use is ad hoc with no approved workflow or control.", three: "AI pilots exist with partial data, approval and ownership rules.", five: "Governed AI workflows have owners, human approval, metrics and audit trails." },
+    },
+    zh: {
+      direction: { title: "方向 OS", description: "公司未来 12 个月要去哪里，接下来 90 天必须完成什么？", one: "方向不清楚，或只存在老板脑中。", three: "领导层知道方向，但团队对齐和衡量方式不一致。", five: "方向可衡量，并分解成 90 天优先事项和定期复盘。" },
+      performance: { title: "绩效 OS", description: "团队如何把目标转化成习惯、关键行动、结果和责任？", one: "目标、行动和负责人没有被一致管理。", three: "已有 KPI，但每周执行和跟进不稳定。", five: "目标带动有负责人的每周行动、可见结果和纠偏复盘。" },
+      money: { title: "金钱 OS", description: "哪些行动真正影响营收、利润、现金流或营运成本？", one: "不清楚商业驱动因素，也没有衡量。", three: "已有财务数字，但行动与结果的连接较弱。", five: "关键金钱驱动因素有基线、负责人、目标和定期复盘。" },
+      reward: { title: "奖励 OS", description: "员工达成约定结果后会得到什么，规则是否透明和公平？", one: "奖励不清楚、主观，或与结果没有连接。", three: "部分奖励已连接，但规则或执行仍不完整。", five: "奖励与认可透明、公平，并与结果直接连接。" },
+      talent: { title: "人才 OS", description: "谁负责工作、谁适合哪个岗位，以及谁需要发展？", one: "岗位、责任和能力缺口不清楚。", three: "已有岗位，但适配、责任或发展并不一致。", five: "岗位适配、责任人和发展优先事项都很清楚。" },
+      aiExecution: { title: "AI 执行 OS", description: "哪些工作交给 AI、哪些必须由人负责，以及如何处理异常和衡量结果？", one: "AI 使用零散，没有获准流程或管控。", three: "已有 AI 试点，但数据、批准和责任规则只完成一部分。", five: "AI 流程有负责人、人工批准、指标和审计记录。" },
+    },
+  },
+};
+
 let state = loadState();
 let validationError = "";
 const app = document.querySelector("#app");
@@ -126,13 +163,16 @@ function preScreen() {
   <label class="consent"><input type="checkbox" data-path="pre.consent" ${state.pre.consent ? "checked" : ""}/><span>${tr("consent")}</span></label>${formFooter("diagnostic")}</form></section>`;
 }
 
-function ratingRow(label, path, evidence, evidencePath) {
+function ratingRow(guidance, path, evidencePath) {
   const rating = path.split(".").reduce((obj,key)=>obj?.[key],state);
-  return `<article class="rating-row"><div><strong>${esc(label)}</strong><div class="rating-buttons">${[1,2,3,4,5].map(n=>`<button type="button" data-rating-path="${path}" data-value="${n}" class="${Number(rating)===n?"active":""}" aria-label="${esc(label)} ${n}">${n}</button>`).join("")}</div></div><div class="evidence-fields">${input(`${evidencePath}.note`,tr("evidenceNote"),{required:true})}${input(`${evidencePath}.source`,tr("evidenceSource"),{required:true})}</div></article>`;
+  const selectLabel = state.language === "en" ? "Select the score that best matches the current reality" : "请选择最符合公司现况的评分";
+  return `<article class="rating-row"><div class="rating-question"><strong>${esc(guidance.title)}</strong><p class="assessment-definition">${esc(guidance.description)}</p><div class="score-anchors"><span><b>1</b>${esc(guidance.one)}</span><span><b>3</b>${esc(guidance.three)}</span><span><b>5</b>${esc(guidance.five)}</span></div><small class="select-score-label">${selectLabel}</small><div class="rating-buttons">${[1,2,3,4,5].map(n=>`<button type="button" data-rating-path="${path}" data-value="${n}" class="${Number(rating)===n?"active":""}" aria-label="${esc(guidance.title)} ${n}">${n}</button>`).join("")}</div></div><div class="evidence-fields">${input(`${evidencePath}.note`,tr("evidenceNote"),{required:true})}${input(`${evidencePath}.source`,tr("evidenceSource"),{required:true})}</div></article>`;
 }
 function diagnosticScreen() {
   const { score, confidence, stageKey } = metrics();
-  return `<section class="page-shell">${screenHeader("02",tr("diagTitle"),tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div><div><span>${tr("confidence")}</span><strong>${confidence.level.toUpperCase()} · ${confidence.percentage}%</strong></div></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${labels.stages[state.language].map((label,index)=>ratingRow(label,`diagnostic.stageRatings.${index}`,state.diagnostic.stageEvidence[index],`diagnostic.stageEvidence.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map(key=>ratingRow(labels.os[key],`diagnostic.osRatings.${key}`,state.diagnostic.osEvidence[key],`diagnostic.osEvidence.${key}`)).join("")}</fieldset>${formFooter("plan")}</form></section>`;
+  const guide = assessmentGuidance;
+  const scoringIntro = state.language === "en" ? "Use the descriptions below before choosing. A higher score always means the capability is more established, repeatable and less dependent on individuals." : "请先阅读每项说明再评分。分数越高，代表该能力越成熟、越能重复执行，也越不依赖个人。";
+  return `<section class="page-shell">${screenHeader("02",tr("diagTitle"),tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div><div><span>${tr("confidence")}</span><strong>${confidence.level.toUpperCase()} · ${confidence.percentage}%</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item,index)=>ratingRow(item,`diagnostic.stageRatings.${index}`,`diagnostic.stageEvidence.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map(key=>ratingRow(guide.os[state.language][key],`diagnostic.osRatings.${key}`,`diagnostic.osEvidence.${key}`)).join("")}</fieldset>${formFooter("plan")}</form></section>`;
 }
 
 function planScreen() {
