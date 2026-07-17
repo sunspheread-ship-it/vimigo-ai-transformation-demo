@@ -1,5 +1,6 @@
 import { calculateEvidenceConfidence, calculateScore, estimateRevenueOpportunity, getStage } from "./scoring.js";
 import { initialState, osKeys } from "./sample-data.js";
+import { buildDetailedReports } from "./reports.js";
 
 const STORAGE_KEY = "vimigo-transformation-demo-v2";
 const copy = {
@@ -111,7 +112,28 @@ const app = document.querySelector("#app");
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
 function esc(value) { return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char])); }
 function loadState() {
-  try { return { ...clone(initialState), ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") }; }
+  try {
+    const base = clone(initialState);
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    return {
+      ...base,
+      ...saved,
+      pre: { ...base.pre, ...(saved.pre || {}) },
+      diagnostic: {
+        ...base.diagnostic,
+        ...(saved.diagnostic || {}),
+        osRatings: { ...base.diagnostic.osRatings, ...(saved.diagnostic?.osRatings || {}) },
+        stageEvidence: base.diagnostic.stageEvidence.map((item, index) => ({ ...item, ...(saved.diagnostic?.stageEvidence?.[index] || {}) })),
+        osEvidence: Object.fromEntries(osKeys.map((key) => [key, { ...base.diagnostic.osEvidence[key], ...(saved.diagnostic?.osEvidence?.[key] || {}) }])),
+        bottlenecks: base.diagnostic.bottlenecks.map((item, index) => ({ ...item, ...(saved.diagnostic?.bottlenecks?.[index] || {}) })),
+      },
+      plan: {
+        ...base.plan,
+        ...(saved.plan || {}),
+        hypotheses: base.plan.hypotheses.map((item, index) => ({ ...item, ...(saved.plan?.hypotheses?.[index] || {}) })),
+      },
+    };
+  }
   catch { return clone(initialState); }
 }
 function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -168,16 +190,27 @@ function ratingRow(guidance, path, evidencePath) {
   const selectLabel = state.language === "en" ? "Select the score that best matches the current reality" : "请选择最符合公司现况的评分";
   return `<article class="rating-row"><div class="rating-question"><strong>${esc(guidance.title)}</strong><p class="assessment-definition">${esc(guidance.description)}</p><div class="score-anchors"><span><b>1</b>${esc(guidance.one)}</span><span><b>3</b>${esc(guidance.three)}</span><span><b>5</b>${esc(guidance.five)}</span></div><small class="select-score-label">${selectLabel}</small><div class="rating-buttons">${[1,2,3,4,5].map(n=>`<button type="button" data-rating-path="${path}" data-value="${n}" class="${Number(rating)===n?"active":""}" aria-label="${esc(guidance.title)} ${n}">${n}</button>`).join("")}</div></div><div class="evidence-fields">${input(`${evidencePath}.note`,tr("evidenceNote"),{required:true})}${input(`${evidencePath}.source`,tr("evidenceSource"),{required:true})}</div></article>`;
 }
+
+function workflowCandidateForm(item, index) {
+  const base = `diagnostic.bottlenecks.${index}`;
+  return `<section class="workflow-candidate-form"><header><span>0${index + 1}</span><div><b>${state.language === "en" ? "AI workflow candidate" : "AI 工作流程候选"}</b><small>${state.language === "en" ? "Candidate only - not yet implemented" : "仅为候选方案，尚未实施"}</small></div></header><div class="two-col">${input(`${base}.issue`,"Business problem",{required:true})}${input(`${base}.impact`,"Business impact",{required:true})}${input(`${base}.trigger`,"Workflow trigger",{required:true})}${input(`${base}.inputs`,"Required inputs / data",{required:true,multiline:true})}${input(`${base}.aiTask`,"Proposed AI task",{required:true,multiline:true})}${input(`${base}.humanApproval`,"Human approval point",{required:true,multiline:true})}${input(`${base}.owner`,"Accountable owner",{required:true})}${input(`${base}.exceptions`,"Exception route",{required:true,multiline:true})}${input(`${base}.metric`,"Success metric",{required:true})}${input(`${base}.readiness`,"Readiness assessment",{required:true})}${input(`${base}.risk`,"Primary risk",{required:true,multiline:true})}</div></section>`;
+}
+
 function diagnosticScreen() {
   const { score, confidence, stageKey } = metrics();
   const guide = assessmentGuidance;
   const scoringIntro = state.language === "en" ? "Use the descriptions below before choosing. A higher score always means the capability is more established, repeatable and less dependent on individuals." : "请先阅读每项说明再评分。分数越高，代表该能力越成熟、越能重复执行，也越不依赖个人。";
-  return `<section class="page-shell">${screenHeader("02",tr("diagTitle"),tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div><div><span>${tr("confidence")}</span><strong>${confidence.level.toUpperCase()} · ${confidence.percentage}%</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item,index)=>ratingRow(item,`diagnostic.stageRatings.${index}`,`diagnostic.stageEvidence.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map(key=>ratingRow(guide.os[state.language][key],`diagnostic.osRatings.${key}`,`diagnostic.osEvidence.${key}`)).join("")}</fieldset>${formFooter("plan")}</form></section>`;
+  return `<section class="page-shell">${screenHeader("02",tr("diagTitle"),tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div><div><span>${tr("confidence")}</span><strong>${confidence.level.toUpperCase()} · ${confidence.percentage}%</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item,index)=>ratingRow(item,`diagnostic.stageRatings.${index}`,`diagnostic.stageEvidence.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map(key=>ratingRow(guide.os[state.language][key],`diagnostic.osRatings.${key}`,`diagnostic.osEvidence.${key}`)).join("")}</fieldset><fieldset><legend>C · ${state.language === "en" ? "Top three business bottlenecks and AI workflow candidates" : "三大业务瓶颈与 AI 工作流程候选"}</legend><p class="help">${state.language === "en" ? "Complete every governance field. These are proposed workflows only; implementation requires a separate readiness and risk decision." : "请完成每个治理字段。这些只是建议流程；实施前仍需另行确认准备度与风险。"}</p>${state.diagnostic.bottlenecks.map(workflowCandidateForm).join("")}</fieldset>${formFooter("plan")}</form></section>`;
+}
+
+function hypothesisForm(item, index) {
+  const base = `plan.hypotheses.${index}`;
+  return `<section class="hypothesis-form"><span>0${index + 1}</span><div class="two-col">${input(`${base}.opportunity`,"Business-model opportunity",{required:true})}${input(`${base}.assumption`,"Assumption requiring validation",{required:true,multiline:true})}${input(`${base}.upside`,"Expected upside",{required:true,multiline:true})}${input(`${base}.validation`,"Validation action",{required:true,multiline:true})}${input(`${base}.metric`,"Validation metric",{required:true})}</div></section>`;
 }
 
 function planScreen() {
   const products=["Vimigo for CEO 5.0","Vimigo For Team 2.0","CVO Program","Vimigo for AI Team","Starter Workspace"];
-  return `<section class="page-shell">${screenHeader("03",tr("planTitle"),tr("planIntro"))}<form data-form="plan"><fieldset><legend>A · 90-Day execution</legend>${input("plan.result",tr("result"),{required:true,multiline:true})}<div class="two-col">${input("plan.weeklyAction",tr("weeklyAction"),{required:true,multiline:true})}${input("plan.metric",tr("metric"),{required:true})}${input("plan.reward",tr("reward"),{required:true})}${input("plan.owner",tr("owner"),{required:true})}</div><div class="roadmap">${[1,30,60,90].map(day=>input(`plan.day${day}`,`Day ${day}`,{required:true,multiline:true})).join("")}</div></fieldset><fieldset><legend>B · One primary next move</legend><label class="field"><span>${tr("product")} *</span><select data-path="plan.primaryProduct">${products.map(p=>`<option ${state.plan.primaryProduct===p?"selected":""}>${p}</option>`).join("")}</select></label>${input("plan.productReason",tr("reason"),{required:true,multiline:true})}${input("plan.expectedResult",tr("expected"),{required:true,multiline:true})}<div class="two-col">${input("plan.reviewDate",tr("reviewDate"),{type:"date",required:true})}${input("plan.owner",tr("owner"),{required:true})}</div></fieldset><fieldset><legend>C · Starter Workspace gate</legend><label class="consent"><input type="checkbox" data-path="plan.workspaceConfirmed" ${state.plan.workspaceConfirmed?"checked":""}/><span>${tr("workspace")}</span></label>${state.plan.workspaceConfirmed?input("plan.workspaceName",tr("workspaceName"),{required:true}):`<p class="help">${state.language==="en"?"Workspace setup remains hidden until commercial activation is confirmed.":"只有在商业启动确认后，Workspace 设置才会开放。"}</p>`}</fieldset>${formFooter("reports",true)}</form></section>`;
+  return `<section class="page-shell">${screenHeader("03",tr("planTitle"),tr("planIntro"))}<form data-form="plan"><fieldset><legend>A · 90-Day execution</legend>${input("plan.result",tr("result"),{required:true,multiline:true})}<div class="two-col">${input("plan.weeklyAction",tr("weeklyAction"),{required:true,multiline:true})}${input("plan.metric",tr("metric"),{required:true})}${input("plan.reward",tr("reward"),{required:true})}${input("plan.owner",tr("owner"),{required:true})}</div><div class="roadmap">${[1,30,60,90].map(day=>input(`plan.day${day}`,`Day ${day}`,{required:true,multiline:true})).join("")}</div></fieldset><fieldset><legend>B · One primary next move</legend><label class="field"><span>${tr("product")} *</span><select data-path="plan.primaryProduct">${products.map(p=>`<option ${state.plan.primaryProduct===p?"selected":""}>${p}</option>`).join("")}</select></label>${input("plan.productReason",tr("reason"),{required:true,multiline:true})}${input("plan.expectedResult",tr("expected"),{required:true,multiline:true})}<div class="two-col">${input("plan.reviewDate",tr("reviewDate"),{type:"date",required:true})}${input("plan.owner",tr("owner"),{required:true})}</div></fieldset><fieldset><legend>C · Business-model opportunities</legend><p class="help">Maximum three opportunities. Each must state the assumption, expected upside, validation action and metric.</p>${state.plan.hypotheses.slice(0,3).map(hypothesisForm).join("")}</fieldset><fieldset><legend>D · Starter Workspace gate</legend><label class="consent"><input type="checkbox" data-path="plan.workspaceConfirmed" ${state.plan.workspaceConfirmed?"checked":""}/><span>${tr("workspace")}</span></label>${state.plan.workspaceConfirmed?input("plan.workspaceName",tr("workspaceName"),{required:true}):`<p class="help">${state.language==="en"?"Workspace setup remains hidden until commercial activation is confirmed.":"只有在商业启动确认后，Workspace 设置才会开放。"}</p>`}</fieldset>${formFooter("reports",true)}</form></section>`;
 }
 
 function reportHeader(number,title,subtitle){return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${subtitle}</p></div><button class="ghost" data-print="${number}">${tr("print")}</button></header>`;}
@@ -196,14 +229,31 @@ function reportsScreen(){
   return `<section class="reports-shell">${screenHeader("04",tr("reports"),state.language==="en"?"Six separate drafts. CSM review and approval are mandatory before delivery.":"六份独立草稿。交付前必须由 CSM 审核批准。")}${state.submitted?`<div class="confirmation">✓ ${tr("confirmed")}</div>`:""}<div class="report-index">${reports.map((_,i)=>`<a href="#report-${i+1}">0${i+1}</a>`).join("")}</div>${reports.map((report,i)=>report.replace("class=\"report-sheet\"",`id="report-${i+1}" class="report-sheet"`)).join("")}<div class="submit-bar"><div><b>${state.submitted?tr("confirmed"):"CSM REVIEW GATE"}</b><p>${state.language==="en"?"Nothing is released automatically. Delivery remains manual during the pilot.":"系统不会自动发送报告。试点期间由 CSM 手动交付。"}</p></div><button class="primary" data-submit ${state.submitted?"disabled":""}>${tr("submit")}</button></div></section>`;
 }
 
+function detailedReportsScreen() {
+  const { score, confidence, stageKey } = metrics();
+  return buildDetailedReports({
+    state,
+    score,
+    confidence,
+    stageKey,
+    stageName: labels.stageNames[state.language][stageKey],
+    opportunity: estimateRevenueOpportunity(state.pre),
+    guidance: assessmentGuidance,
+    osKeys,
+    t: tr,
+  });
+}
+
 function formFooter(next,final=false){return `${validationError?`<p class="form-error">${tr("required")}</p>`:""}<footer class="form-footer"><span>✓ ${tr("save")}</span><button type="button" class="primary" data-continue="${next}" data-final="${final}">${tr("continue")} →</button></footer>`;}
 function render(){
   document.documentElement.lang=state.language==="zh"?"zh-Hans":"en";
-  const screens={journey:journeyScreen,pre:preScreen,diagnostic:diagnosticScreen,plan:planScreen,reports:reportsScreen};
+  const screens={journey:journeyScreen,pre:preScreen,diagnostic:diagnosticScreen,plan:planScreen,reports:detailedReportsScreen};
   app.innerHTML=layout(screens[state.activeStep]());
 }
 function validate(step){
-  const required={pre:[state.pre.company,state.pre.industry,state.pre.participants,state.pre.decisionMaker,state.pre.executionOwner,state.pre.direction,state.pre.problem,state.pre.baseline,state.pre.target,state.pre.dataSource,state.pre.consent],diagnostic:evidenceItems().map(item=>item.note||item.source),plan:[state.plan.result,state.plan.weeklyAction,state.plan.metric,state.plan.reward,state.plan.owner,state.plan.day1,state.plan.day30,state.plan.day60,state.plan.day90,state.plan.primaryProduct,state.plan.productReason,state.plan.expectedResult,state.plan.reviewDate]};
+  const workflowFields = ["issue","impact","trigger","inputs","aiTask","humanApproval","owner","exceptions","metric","readiness","risk"];
+  const hypothesisFields = ["opportunity","assumption","upside","validation","metric"];
+  const required={pre:[state.pre.company,state.pre.industry,state.pre.participants,state.pre.decisionMaker,state.pre.executionOwner,state.pre.direction,state.pre.problem,state.pre.baseline,state.pre.target,state.pre.dataSource,state.pre.consent],diagnostic:[...evidenceItems().flatMap(item=>[item.note,item.source]),...state.diagnostic.bottlenecks.flatMap(item=>workflowFields.map(field=>item[field]))],plan:[state.plan.result,state.plan.weeklyAction,state.plan.metric,state.plan.reward,state.plan.owner,state.plan.day1,state.plan.day30,state.plan.day60,state.plan.day90,state.plan.primaryProduct,state.plan.productReason,state.plan.expectedResult,state.plan.reviewDate,...state.plan.hypotheses.slice(0,3).flatMap(item=>hypothesisFields.map(field=>item[field]))]};
   if(step==="plan"&&state.plan.workspaceConfirmed) required.plan.push(state.plan.workspaceName);
   return (required[step]||[]).every(value=>String(value??"").trim());
 }

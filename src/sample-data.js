@@ -40,9 +40,9 @@ export const initialState = {
       aiExecution: { note: "Three candidate workflows identified; none deployed.", source: "Workshop notes" },
     },
     bottlenecks: [
-      { issue: "Slow WhatsApp lead response", impact: "Prospects move to competitors", owner: "Customer Care Lead" },
-      { issue: "Weak appointment confirmation", impact: "Chair capacity and revenue are lost", owner: "Clinic Manager" },
-      { issue: "Late branch performance data", impact: "Corrective action starts too late", owner: "Operations Manager" },
+      { issue: "Slow WhatsApp lead response", impact: "Prospects move to competitors", trigger: "A new WhatsApp enquiry is received", inputs: "Enquiry text, branch, service requested, operating hours and approved reply rules", aiTask: "Classify intent, summarise the enquiry and draft the next approved response", humanApproval: "Customer Care Lead approves sensitive, unusual or high-value replies", owner: "Customer Care Lead", exceptions: "Clinical advice, complaints, refunds and messages with unclear consent route to a human", metric: "Median first-response time and lead assignment rate", readiness: "Medium - message data exists but routing rules need standardisation", risk: "Incorrect or inappropriate customer-facing reply" },
+      { issue: "Weak appointment confirmation", impact: "Chair capacity and revenue are lost", trigger: "An appointment reaches the 48-hour and 24-hour confirmation windows", inputs: "Appointment time, branch, patient contact preference and approved reminder template", aiTask: "Prepare reminder and confirmation follow-up tasks using approved templates", humanApproval: "Clinic Manager approves rescheduling, complaints and special-care cases", owner: "Clinic Manager", exceptions: "Medical questions, repeated no-response and rescheduling conflicts route to staff", metric: "Confirmation completion rate and no-show rate", readiness: "Medium - appointment data exists but consent and exception rules require review", risk: "Privacy, consent or incorrect appointment information" },
+      { issue: "Late branch performance data", impact: "Corrective action starts too late", trigger: "The daily reporting cut-off is reached", inputs: "Approved branch KPI records, ownership list, targets and exception thresholds", aiTask: "Summarise KPI variance, identify missing updates and draft an exception digest", humanApproval: "Operations Manager validates exceptions before management circulation", owner: "Operations Manager", exceptions: "Missing, disputed or materially abnormal data is held for manual validation", metric: "D+1 report completion and exception-closure rate", readiness: "Medium - source data exists but definitions and cut-off discipline vary", risk: "Management decisions based on incomplete or inconsistent data" },
     ],
   },
   plan: {
@@ -62,9 +62,9 @@ export const initialState = {
     workspaceConfirmed: false,
     workspaceName: "",
     hypotheses: [
-      { opportunity: "Centralise lead ownership", assumption: "Response delay is mainly caused by fragmented intake.", validation: "Pilot one intake queue for 30 days.", metric: "Median response time" },
-      { opportunity: "Protect appointment capacity", assumption: "Structured reminders can reduce avoidable no-shows.", validation: "Test 48/24-hour confirmations in one branch.", metric: "No-show rate" },
-      { opportunity: "Standardise branch review", assumption: "Faster visibility will improve corrective action.", validation: "Run a D+1 dashboard and weekly review.", metric: "Review completion rate" },
+      { opportunity: "Centralise lead ownership", assumption: "Response delay is mainly caused by fragmented intake.", upside: "Faster response, clearer ownership and fewer unassigned enquiries.", validation: "Pilot one intake queue for 30 days.", metric: "Median response time" },
+      { opportunity: "Protect appointment capacity", assumption: "Structured reminders can reduce avoidable no-shows.", upside: "More usable chair capacity and fewer avoidable schedule gaps.", validation: "Test 48/24-hour confirmations in one branch.", metric: "No-show rate" },
+      { opportunity: "Standardise branch review", assumption: "Faster visibility will improve corrective action.", upside: "Earlier intervention and more consistent branch execution.", validation: "Run a D+1 dashboard and weekly review.", metric: "Review completion rate" },
     ],
   },
 };
