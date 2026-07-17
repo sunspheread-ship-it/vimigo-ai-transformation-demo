@@ -1,0 +1,10 @@
+{
+  "name": "vimigo-ai-transformation-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/app.js && node --check src/scoring.js",
+    "serve": "python -m http.server 4173"
+  }
+}
