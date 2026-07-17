@@ -505,7 +505,7 @@ function journeyScreen() {
         `<article><span>${n}</span><small>${a}</small><h2>${b}</h2></article>`,
     )
     .join("")}</section>
-  <section class="promise"><div><strong>6</strong><span>${state.language === "en" ? "separate bilingual PDF deliverables" : "份独立双语 PDF 成果"}</span></div><p>${state.language === "en" ? "No performance figure is shown unless it comes from client data or cited evidence." : "除非数据来自客户输入或明确证据，否则报告不会显示任何绩效数字。"}</p></section>`;
+  <section class="promise"><div><strong>6</strong><span>${state.language === "en" ? "personalised PDF report drafts generated from the completed form" : "根据已完成表格生成的六份个性化 PDF 报告草稿"}</span></div><p>${state.language === "en" ? "The reports use the answers entered in this case. Final client PDFs are exported only after CSM review and approval." : "报告内容来自本个案填写的资料。只有在 CSM 审核并批准后，系统才会导出最终客户 PDF。"}</p></section>`;
 }
 
 function preScreen() {

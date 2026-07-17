@@ -32,6 +32,13 @@ test("public demo does not claim that a CSM was notified", () => {
   assert.doesNotMatch(appSource, /Submission confirmed for CSM review/);
 });
 
+test("reports are described as case-generated drafts, not fixed sample PDFs", () => {
+  assert.match(reportsSource, /generated from the form answers in this case/);
+  assert.match(reportsSource, /Final PDFs are exported only after CSM review and approval/);
+  assert.match(reportsSource, /GENERATED FROM THIS CASE/);
+  assert.doesNotMatch(appSource, /separate bilingual PDF deliverables/);
+});
+
 test("diagnostic ratings do not ask for repeated evidence notes or sources", () => {
   const ratingSection = appSource.slice(
     appSource.indexOf("function ratingRow"),

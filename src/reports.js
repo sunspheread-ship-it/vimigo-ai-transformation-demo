@@ -79,7 +79,7 @@ const pending = (language) =>
   r(language, "Requires CSM validation", "需要 CSM 验证");
 
 function reportHeader(number, title, subtitle) {
-  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${esc(subtitle)}</p></div><button class="ghost" data-print="${number}">Print / Save this PDF</button></header>`;
+  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · GENERATED FROM THIS CASE · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${esc(subtitle)}</p></div><button class="ghost" data-print="${number}">Preview / Save draft PDF</button></header>`;
 }
 
 function reportMeta(state, language) {
@@ -379,7 +379,7 @@ export function buildDetailedReports(ctx) {
   ];
   const intro = r(
     language,
-    "Six detailed consulting drafts. Each report contains evidence, interpretation, actions, owners, metrics and approval gates.",
+    "Six personalised consulting drafts generated from the form answers in this case. Final PDFs are exported only after CSM review and approval.",
     "六份详细顾问报告草稿。每份报告包含证据、分析、行动、负责人、指标和批准关卡。 ",
   );
   return `<section class="reports-shell"><header class="screen-header"><span>04</span><div><p>VIMIGO AI TRANSFORMATION DAY</p><h1>${r(language, "Six Detailed Reports", "六份详细报告")}</h1><small>${intro}</small></div></header>${ctx.state.submitted ? `<div class="confirmation">✓ ${ctx.t("confirmed")}</div>` : ""}<div class="report-index">${reports.map((_, i) => `<a href="#report-${i + 1}">0${i + 1}</a>`).join("")}</div>${reports.map((report, i) => report.replace('class="report-sheet', `id="report-${i + 1}" class="report-sheet`)).join("")}<div class="submit-bar"><div><b>${ctx.state.submitted ? ctx.t("confirmed") : r(language, "PUBLIC DEMO - LOCAL SAVE ONLY", "公开示范 - 仅本机保存")}</b><p>${r(language, "This GitHub demo does not transmit client data or notify a CSM. Use the private pilot link for real submissions.", "此 GitHub 示范不会传送客户资料，也不会通知 CSM。真实提交必须使用私人试点链接。")}</p></div><button class="primary" data-submit ${ctx.state.submitted ? "disabled" : ""}>${ctx.t("submit")}</button></div></section>`;
