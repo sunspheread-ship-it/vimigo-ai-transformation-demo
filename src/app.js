@@ -24,7 +24,7 @@ const copy = {
     continue: "Continue", save: "Saved on this device", required: "Please complete the highlighted required fields.",
     method: "Methodology", methodText: "Overall score = 40% maturity assessment + 60% Six OS average. Each 1–5 rating converts to 20–100.",
     evidenceText: "Confidence is Low below 50%, Medium at 50–79%, and High at 80% or above.",
-    submit: "Confirm for CSM review", confirmed: "Submission confirmed for CSM review", reset: "Reload sample", print: "Print / Save this PDF",
+    submit: "Save demo review pack", confirmed: "Saved on this device only - the CSM was not notified", reset: "Reload sample", print: "Print / Save this PDF",
     facts: "Verified client facts", assessment: "CSM assessment", hypothesis: "Hypothesis requiring validation", notQuantified: "Financial impact is not yet quantified because sufficient baseline data was not supplied.",
   },
   zh: {
@@ -47,7 +47,7 @@ const copy = {
     continue: "继续", save: "已保存在此装置", required: "请完成标示的必填项目。",
     method: "评分方法", methodText: "总分 = 40% 企业成熟度 + 60% 六大 OS 平均分。每个 1–5 评分转换为 20–100。",
     evidenceText: "证据可信度：低于50%为 Low，50–79%为 Medium，80%以上为 High。",
-    submit: "确认交给 CSM 审核", confirmed: "已确认交给 CSM 审核", reset: "重新载入示范", print: "打印／储存此报告",
+    submit: "保存示范审核资料", confirmed: "仅保存在此装置 - CSM 尚未收到通知", reset: "重新载入示范", print: "打印／储存此报告",
     facts: "已核实的客户事实", assessment: "CSM 评估", hypothesis: "需要验证的假设", notQuantified: "由于客户未提供足够基线资料，目前无法量化财务影响。",
   },
 };

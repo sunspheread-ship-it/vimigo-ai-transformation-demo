@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const reportsSource = readFileSync(new URL("../src/reports.js", import.meta.url), "utf8");
+const appSource = readFileSync(new URL("../src/app.js", import.meta.url), "utf8");
 
 test("detailed pack contains exactly six report templates", () => {
   assert.equal((reportsSource.match(/data-report="0[1-6]"/g) || []).length, 6);
@@ -23,4 +24,10 @@ test("report pack keeps facts, assessments and hypotheses separate", () => {
 test("financial impact remains conditional on supplied baselines", () => {
   assert.match(reportsSource, /opportunity === null/);
   assert.match(reportsSource, /not a guaranteed gain/);
+});
+
+test("public demo does not claim that a CSM was notified", () => {
+  assert.match(reportsSource, /does not transmit client data or notify a CSM/);
+  assert.match(appSource, /the CSM was not notified/);
+  assert.doesNotMatch(appSource, /Submission confirmed for CSM review/);
 });
