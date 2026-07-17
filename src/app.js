@@ -736,7 +736,7 @@ app.addEventListener("click", (event) => {
   }
   const next = event.target.closest("[data-continue]")?.dataset.continue;
   if (next) {
-    const activeForm = event.target.closest("form");
+    const activeForm = app.querySelector(`[data-form="${state.activeStep}"]`);
     const visibleFormIsValid = activeForm
       ? [...activeForm.querySelectorAll("[required]")].every((field) =>
           field.type === "checkbox"
