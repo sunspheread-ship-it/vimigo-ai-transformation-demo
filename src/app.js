@@ -736,7 +736,9 @@ app.addEventListener("click", (event) => {
   }
   const next = event.target.closest("[data-continue]")?.dataset.continue;
   if (next) {
-    if (!validate(state.activeStep)) {
+    const activeForm = event.target.closest("form");
+    const visibleFormIsValid = activeForm ? activeForm.reportValidity() : true;
+    if (!visibleFormIsValid || !validate(state.activeStep)) {
       validationError = tr("required");
       render();
       return;

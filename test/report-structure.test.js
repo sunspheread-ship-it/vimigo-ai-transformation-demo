@@ -39,6 +39,11 @@ test("reports are described as case-generated drafts, not fixed sample PDFs", ()
   assert.doesNotMatch(appSource, /separate bilingual PDF deliverables/);
 });
 
+test("continue validates the visible form and saved model", () => {
+  assert.match(appSource, /activeForm\.reportValidity\(\)/);
+  assert.match(appSource, /!visibleFormIsValid \|\| !validate\(state\.activeStep\)/);
+});
+
 test("diagnostic ratings do not ask for repeated evidence notes or sources", () => {
   const ratingSection = appSource.slice(
     appSource.indexOf("function ratingRow"),
