@@ -4,6 +4,7 @@ import test from "node:test";
 
 const reportsSource = readFileSync(new URL("../src/reports.js", import.meta.url), "utf8");
 const appSource = readFileSync(new URL("../src/app.js", import.meta.url), "utf8");
+const stylesSource = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 
 test("detailed pack contains exactly six report templates", () => {
   assert.equal((reportsSource.match(/data-report="0[1-6]"/g) || []).length, 6);
@@ -57,4 +58,9 @@ test("diagnostic ratings do not ask for repeated evidence notes or sources", () 
 test("header uses the official Vimigo website logo asset", () => {
   assert.match(appSource, /vimigo\.io\/wp-content\/uploads\/2025\/10\/Logo\.png/);
   assert.match(appSource, /alt="Vimigo"/);
+});
+
+test("hero score ring keeps a perfect square aspect ratio", () => {
+  assert.match(stylesSource, /\.score-orbit\s*\{[^}]*aspect-ratio:\s*1\s*\/\s*1/s);
+  assert.doesNotMatch(stylesSource, /\.score-orbit\s*\{[^}]*min-height:/s);
 });

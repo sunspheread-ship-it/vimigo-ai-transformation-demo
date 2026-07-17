@@ -200,7 +200,9 @@ main {
   margin-top: 18px;
 }
 .score-orbit {
-  min-height: 410px;
+  width: min(100%, 410px);
+  aspect-ratio: 1 / 1;
+  justify-self: center;
   border: 22px solid transparent;
   border-radius: 50%;
   background:
@@ -768,7 +770,7 @@ form {
     padding-top: 56px;
   }
   .score-orbit {
-    min-height: 320px;
+    width: min(100%, 360px);
     margin: 0 12px;
   }
   .score-orbit strong {
