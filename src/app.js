@@ -738,32 +738,6 @@ function safeFileName(value, fallback = "Vimigo report") {
   return (cleaned || fallback).slice(0, 100);
 }
 
-function alignPdfSectionsToPages(report) {
-  const printableWidthMm = 210 - 14;
-  const printableHeightMm = 297 - 7 - 9;
-  const pageHeightPx = report.scrollWidth * (printableHeightMm / printableWidthMm);
-  const reportTop = report.getBoundingClientRect().top;
-
-  report.querySelectorAll(".pdf-page-break").forEach((marker) => {
-    marker.style.height = "0px";
-    const offset = marker.getBoundingClientRect().top - reportTop;
-    const remainder = ((offset % pageHeightPx) + pageHeightPx) % pageHeightPx;
-    const spacer = remainder < 2 ? 0 : pageHeightPx - remainder;
-    marker.style.height = `${spacer}px`;
-  });
-
-  const footer = report.querySelector(".report-footer");
-  if (footer) {
-    const contentHeight = Math.ceil(
-      footer.getBoundingClientRect().bottom - reportTop + 28,
-    );
-    report.style.height = `${contentHeight}px`;
-    report.style.overflow = "visible";
-    report.parentElement.style.height = `${contentHeight}px`;
-    report.parentElement.style.overflow = "visible";
-  }
-}
-
 async function renderCompletePdf(report) {
   const options = {
     margin: [7, 7, 9, 7],
@@ -777,6 +751,10 @@ async function renderCompletePdf(report) {
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     pagebreak: { mode: [] },
   };
+  const reportTop = report.getBoundingClientRect().top;
+  const preferredBreaks = [...report.querySelectorAll(".pdf-page-break")].map(
+    (marker) => marker.getBoundingClientRect().top - reportTop,
+  );
   const worker = window.html2pdf().set(options).from(report).toCanvas();
   const canvas = await worker.get("canvas");
 
@@ -795,11 +773,21 @@ async function renderCompletePdf(report) {
   pageCanvas.width = canvas.width;
   pageCanvas.height = pageHeightPx;
   const context = pageCanvas.getContext("2d");
-  const pageCount = Math.ceil(canvas.height / pageHeightPx);
+  const canvasScale = canvas.width / report.scrollWidth;
+  const canvasBreaks = preferredBreaks.map((offset) => offset * canvasScale);
+  let sourceY = 0;
+  let pageIndex = 0;
 
-  for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
-    const sourceY = pageIndex * pageHeightPx;
-    const sourceHeight = Math.min(pageHeightPx, canvas.height - sourceY);
+  while (sourceY < canvas.height) {
+    const maximumEnd = Math.min(sourceY + pageHeightPx, canvas.height);
+    const preferredEnd = canvasBreaks
+      .filter(
+        (position) =>
+          position > sourceY + pageHeightPx * 0.35 && position <= maximumEnd,
+      )
+      .at(-1);
+    const sourceEnd = preferredEnd || maximumEnd;
+    const sourceHeight = sourceEnd - sourceY;
     context.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
     context.fillStyle = "#ffffff";
     context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
@@ -823,6 +811,8 @@ async function renderCompletePdf(report) {
       pageWidthMm,
       pageHeightMm,
     );
+    sourceY = sourceEnd;
+    pageIndex += 1;
   }
 
   return pdf.output("blob");
@@ -883,8 +873,6 @@ async function downloadReportPdf(reportNumber, button) {
     clone.querySelectorAll("button").forEach((item) => item.remove());
     stage.append(clone);
     document.body.append(stage);
-    alignPdfSectionsToPages(clone);
-
     const pdfBlob = await renderCompletePdf(clone);
 
     const downloadUrl = URL.createObjectURL(pdfBlob);
