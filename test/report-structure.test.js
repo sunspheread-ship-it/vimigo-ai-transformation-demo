@@ -77,7 +77,7 @@ test("report pack offers six direct PDF download buttons without ZIP or print", 
   assert.match(reportsSource, /data-download-report/);
   assert.match(reportsSource, /no ZIP file and no print screen/);
   assert.match(appSource, /downloadReportPdf\(reportNumber, button\)/);
-  assert.match(appSource, /outputPdf\("blob"\)/);
+  assert.match(appSource, /pdf\.output\("blob"\)/);
   assert.match(appSource, /link\.download = `\$\{reportNumber\} - \$\{title\} - \$\{company\}\.pdf`/);
   assert.doesNotMatch(reportsSource, /data-download-all|\.zip/);
   assert.doesNotMatch(appSource, /window\.print\(\)|window\.JSZip/);
