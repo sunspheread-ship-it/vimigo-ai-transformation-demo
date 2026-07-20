@@ -210,7 +210,7 @@ function osReport(ctx) {
     esc(guidance.os[language][key].description),
     esc(osImpact[key]),
   ]);
-  return `<article class="report-sheet detailed-report" data-report="03">${reportHeader("03", "Six OS Gap Radar Report", r(language, "Six operating systems scored from 1 to 5", "六大营运系统按 1 至 5 分评分"))}${reportMeta(state, language)}${factStrip(t)}<div class="os-bars">${osKeys.map((key) => `<div><span>${esc(guidance.os[language][key].title)}</span><i><b style="width:${state.diagnostic.osRatings[key] * 20}%"></b></i><strong>${state.diagnostic.osRatings[key]}/5</strong></div>`).join("")}</div>${section(r(language, "Six OS diagnostic detail", "六大 OS 诊断明细"))}${table(["OS", "Score", "Management question", "Likely business impact"], rows)}${section(r(language, "First three OS areas requiring attention", "优先改善的三大 OS"))}<div class="priority-list">${ranked
+  return `<article class="report-sheet detailed-report" data-report="03">${reportHeader("03", "Six OS Gap Radar Report", r(language, "Six operating systems scored from 1 to 5", "六大营运系统按 1 至 5 分评分"))}${reportMeta(state, language)}${factStrip(t)}<div class="os-bars">${osKeys.map((key) => `<div><span>${esc(guidance.os[language][key].title)}</span><i><b style="width:${state.diagnostic.osRatings[key] * 20}%"></b></i><strong>${state.diagnostic.osRatings[key]}/5</strong></div>`).join("")}</div>${section(r(language, "Six OS assessment detail", "六大 OS 评估明细"))}${table(["OS", "Score", "Management question", "Likely business impact"], rows)}${section(r(language, "First three OS areas requiring attention", "优先改善的三大 OS"))}<div class="priority-list">${ranked
     .slice(0, 3)
     .map(({ key, rating }, index) => {
       const hypothesis = state.plan.hypotheses[index];

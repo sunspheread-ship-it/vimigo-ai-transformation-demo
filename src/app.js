@@ -27,12 +27,12 @@ function blankWorkflowCandidate() {
 const copy = {
   en: {
     demo: "PUBLIC DEMO · DATA STAYS ON THIS DEVICE",
-    title: "One evidence-led diagnosis. Six decision-ready reports.",
+    title: "One evidence-led business assessment. Six decision-ready reports.",
     subtitle:
       "A practical RM980 Transformation Day journey—from client input to a CSM-approved 90-day action map.",
     journey: "Journey",
-    pre: "Pre-Diagnostic",
-    diagnostic: "Onsite Diagnostic",
+    pre: "Pre-Event Assessment",
+    diagnostic: "Onsite Business Assessment",
     plan: "90-Day Plan",
     reports: "Six Reports",
     start: "Start the client journey",
@@ -43,9 +43,9 @@ const copy = {
     together: "Client + CSM onsite",
     management: "Management approval",
     csm: "CSM-controlled delivery",
-    preTitle: "Client Pre-Diagnostic",
+    preTitle: "Pre-Event Business Assessment",
     preIntro:
-      "Complete before Transformation Day. Do not enter employee, patient or medical data.",
+      "Complete before Transformation Day. Do not enter identity numbers, bank details, payroll records or other confidential personal data.",
     company: "Company name",
     industry: "Industry",
     participants: "Participants and roles",
@@ -61,8 +61,8 @@ const copy = {
     targetConversionRate: "Target conversion rate (%)",
     averageValue: "Average transaction value (RM)",
     consent:
-      "I confirm this information may be used for the Vimigo diagnosis and reviewed by the assigned CSM.",
-    diagTitle: "Facilitated Diagnostic Workbook",
+      "I confirm this information may be used for the Vimigo business assessment and reviewed by the assigned CSM.",
+    diagTitle: "Facilitated Business Assessment Workbook",
     diagIntro:
       "Read each explanation, compare the score anchors, then select the rating that best matches the company today.",
     stageAssessment: "Transformation maturity assessment",
@@ -102,12 +102,12 @@ const copy = {
   },
   zh: {
     demo: "公开示范 · 资料只保存在此装置",
-    title: "一次以证据为基础的诊断，产出六份可决策报告。",
+    title: "一次以企业数据为基础的转型评估，产出六份可决策报告。",
     subtitle:
       "RM980 企业转型日实战流程：从客户输入，到 CSM 审核通过的 90 天行动地图。",
     journey: "流程总览",
-    pre: "活动前诊断",
-    diagnostic: "现场诊断",
+    pre: "活动前企业评估",
+    diagnostic: "现场企业转型评估",
     plan: "90天计划",
     reports: "六份报告",
     start: "开始客户流程",
@@ -118,8 +118,8 @@ const copy = {
     together: "客户与 CSM 现场完成",
     management: "管理层确认",
     csm: "CSM 审核后交付",
-    preTitle: "客户活动前诊断表",
-    preIntro: "请在活动前完成。不要输入员工、病患或医疗敏感资料。",
+    preTitle: "企业活动前评估表",
+    preIntro: "请在活动前完成。请勿填写身份证号码、银行资料、薪资记录或其他个人机密资料。",
     company: "公司名称",
     industry: "行业",
     participants: "参与者与职位",
@@ -134,8 +134,8 @@ const copy = {
     conversionRate: "当前转化率（%）",
     targetConversionRate: "目标转化率（%）",
     averageValue: "平均交易价值（RM）",
-    consent: "我确认以上资料可用于 Vimigo 企业诊断，并由指定 CSM 审核。",
-    diagTitle: "现场诊断工作表",
+    consent: "我确认以上资料可用于 Vimigo 企业转型评估，并由指定 CSM 审核。",
+    diagTitle: "现场企业转型评估工作表",
     diagIntro: "请阅读每项说明和评分标准，再选择最符合公司现况的分数。",
     stageAssessment: "企业转型成熟度",
     osAssessment: "六大 OS 成熟度",
@@ -540,7 +540,10 @@ function nav() {
   return `<nav class="step-nav" aria-label="Journey">${items.map(([step, no, key]) => `<button data-step="${step}" class="${state.activeStep === step ? "active" : ""}"><small>${no}</small><span>${tr(key)}</span></button>`).join("")}</nav>`;
 }
 function layout(content) {
-  return `${header()}${nav()}<main>${content}</main><footer class="site-footer">${brand()}<span>Diagnosis first · Human approval · Measurable execution</span></footer>`;
+  const footerMessage = state.language === "en"
+    ? "Business assessment first · Human approval · Measurable execution"
+    : "先评估企业现况 · 人工审核 · 可衡量执行";
+  return `${header()}${nav()}<main>${content}</main><footer class="site-footer">${brand()}<span>${footerMessage}</span></footer>`;
 }
 function input(path, label, options = {}) {
   const value = path.split(".").reduce((obj, key) => obj?.[key], state);
@@ -561,7 +564,7 @@ function journeyScreen() {
     : state.language === "en"
       ? "Not assessed"
       : "尚未评估";
-  return `<section class="hero"><div><p class="eyebrow">FROM DIAGNOSIS TO EXECUTION</p><h1>${tr("title")}</h1><p>${tr("subtitle")}</p><button class="primary" data-step="pre">${tr("start")} →</button></div><div class="score-orbit"><div><small>${tr("score")}</small><strong>${assessed ? score.overall : "—"}</strong><span>${assessed ? "/100" : ""}</span><b>${stageName}</b></div></div></section>
+  return `<section class="hero"><div><p class="eyebrow">${state.language === "en" ? "FROM BUSINESS ASSESSMENT TO EXECUTION" : "从企业评估到落地执行"}</p><h1>${tr("title")}</h1><p>${tr("subtitle")}</p><button class="primary" data-step="pre">${tr("start")} →</button></div><div class="score-orbit"><div><small>${tr("score")}</small><strong>${assessed ? score.overall : "—"}</strong><span>${assessed ? "/100" : ""}</span><b>${stageName}</b></div></div></section>
   <section class="journey-grid">${[
     ["01", tr("client"), tr("pre")],
     ["02", tr("together"), tr("diagnostic")],

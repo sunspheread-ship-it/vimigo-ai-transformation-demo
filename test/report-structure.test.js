@@ -33,6 +33,13 @@ test("public demo does not claim that a CSM was notified", () => {
   assert.doesNotMatch(appSource, /Submission confirmed for CSM review/);
 });
 
+test("client journey uses SME assessment language instead of medical wording", () => {
+  assert.match(appSource, /Pre-Event Business Assessment/);
+  assert.match(appSource, /企业活动前评估表/);
+  assert.match(appSource, /现场企业转型评估工作表/);
+  assert.doesNotMatch(appSource, /客户活动前诊断表|病患|医疗敏感资料/);
+});
+
 test("reports are described as case-generated drafts, not fixed sample PDFs", () => {
   assert.match(reportsSource, /generated from the form answers in this case/);
   assert.match(reportsSource, /Final PDFs are exported only after CSM review and approval/);
