@@ -1141,10 +1141,11 @@ form {
 
 .pdf-export-stage {
   position: absolute;
-  left: -100000px;
-  top: 0;
+  left: 0;
+  top: 100vh;
   width: 760px;
-  z-index: -1;
+  z-index: 0;
+  pointer-events: none;
   background: #fff;
   color: #172033;
 }
