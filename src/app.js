@@ -739,6 +739,7 @@ function safeFileName(value, fallback = "Vimigo report") {
 }
 
 async function renderCompletePdf(report) {
+  const captureHeight = Math.ceil(report.scrollHeight);
   const options = {
     margin: [7, 7, 9, 7],
     image: { type: "jpeg", quality: 0.98 },
@@ -747,6 +748,8 @@ async function renderCompletePdf(report) {
       useCORS: true,
       backgroundColor: "#ffffff",
       logging: false,
+      height: captureHeight,
+      windowHeight: captureHeight,
     },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     pagebreak: { mode: [] },
