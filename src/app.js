@@ -753,6 +753,66 @@ function alignPdfSectionsToPages(report) {
   });
 }
 
+async function renderCompletePdf(report) {
+  const options = {
+    margin: [7, 7, 9, 7],
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+    },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: [] },
+  };
+  const worker = window.html2pdf().set(options).from(report).toCanvas();
+  const canvas = await worker.get("canvas");
+
+  await worker.toPdf();
+  const generatedPdf = await worker.get("pdf");
+  const PdfConstructor = generatedPdf.constructor;
+  const pdf = new PdfConstructor(options.jsPDF);
+  const pageWidthMm = 210 - 14;
+  const pageHeightMm = 297 - 7 - 9;
+  const pageHeightPx = Math.floor(canvas.width * (pageHeightMm / pageWidthMm));
+  const pageCanvas = document.createElement("canvas");
+  pageCanvas.width = canvas.width;
+  pageCanvas.height = pageHeightPx;
+  const context = pageCanvas.getContext("2d");
+  const pageCount = Math.ceil(canvas.height / pageHeightPx);
+
+  for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
+    const sourceY = pageIndex * pageHeightPx;
+    const sourceHeight = Math.min(pageHeightPx, canvas.height - sourceY);
+    context.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+    context.drawImage(
+      canvas,
+      0,
+      sourceY,
+      canvas.width,
+      sourceHeight,
+      0,
+      0,
+      canvas.width,
+      sourceHeight,
+    );
+    if (pageIndex > 0) pdf.addPage();
+    pdf.addImage(
+      pageCanvas.toDataURL("image/jpeg", 0.98),
+      "JPEG",
+      7,
+      7,
+      pageWidthMm,
+      pageHeightMm,
+    );
+  }
+
+  return pdf.output("blob");
+}
+
 async function downloadReportPdf(reportNumber, button) {
   const status = app.querySelector("[data-download-status]");
   if (pdfDownloadInProgress) {
@@ -810,22 +870,7 @@ async function downloadReportPdf(reportNumber, button) {
     document.body.append(stage);
     alignPdfSectionsToPages(clone);
 
-    const pdfBlob = await window
-      .html2pdf()
-      .set({
-        margin: [7, 7, 9, 7],
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          logging: false,
-        },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: [] },
-      })
-      .from(clone)
-      .outputPdf("blob");
+    const pdfBlob = await renderCompletePdf(clone);
 
     const downloadUrl = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
