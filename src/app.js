@@ -751,6 +751,17 @@ function alignPdfSectionsToPages(report) {
     const spacer = remainder < 2 ? 0 : pageHeightPx - remainder;
     marker.style.height = `${spacer}px`;
   });
+
+  const footer = report.querySelector(".report-footer");
+  if (footer) {
+    const contentHeight = Math.ceil(
+      footer.getBoundingClientRect().bottom - reportTop + 28,
+    );
+    report.style.height = `${contentHeight}px`;
+    report.style.overflow = "visible";
+    report.parentElement.style.height = `${contentHeight}px`;
+    report.parentElement.style.overflow = "visible";
+  }
 }
 
 async function renderCompletePdf(report) {
