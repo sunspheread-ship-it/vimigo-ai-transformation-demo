@@ -1245,3 +1245,31 @@ form {
 .pdf-export-report .detail-table td {
   border-color: #d6e0e8;
 }
+.pdf-export-report .pdf-flat-table {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #ccd6df;
+  border-radius: 10px;
+  font-size: 10px;
+}
+.pdf-export-report .pdf-flat-row {
+  display: grid;
+  border-top: 1px solid #d6e0e8;
+}
+.pdf-export-report .pdf-flat-row:first-child {
+  border-top: 0;
+}
+.pdf-export-report .pdf-flat-row > div {
+  min-width: 0;
+  padding: 11px;
+  color: #526171;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.pdf-export-report .pdf-flat-head {
+  background: #e8eef4;
+  font-weight: 800;
+}
+.pdf-export-report .pdf-flat-head > div {
+  color: #172033;
+}

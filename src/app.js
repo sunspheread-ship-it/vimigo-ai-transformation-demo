@@ -818,6 +818,27 @@ async function renderCompletePdf(report) {
   return pdf.output("blob");
 }
 
+function flattenPdfTables(report) {
+  report.querySelectorAll("table").forEach((table) => {
+    const flatTable = document.createElement("div");
+    flatTable.className = "pdf-flat-table";
+    const rows = [...table.rows];
+    const columnCount = Math.max(...rows.map((row) => row.cells.length), 1);
+    rows.forEach((row, rowIndex) => {
+      const flatRow = document.createElement("div");
+      flatRow.className = `pdf-flat-row${rowIndex === 0 ? " pdf-flat-head" : ""}`;
+      flatRow.style.gridTemplateColumns = `repeat(${columnCount}, minmax(0, 1fr))`;
+      [...row.cells].forEach((cell) => {
+        const flatCell = document.createElement("div");
+        flatCell.innerHTML = cell.innerHTML;
+        flatRow.append(flatCell);
+      });
+      flatTable.append(flatRow);
+    });
+    table.replaceWith(flatTable);
+  });
+}
+
 async function downloadReportPdf(reportNumber, button) {
   const status = app.querySelector("[data-download-status]");
   if (pdfDownloadInProgress) {
@@ -871,6 +892,7 @@ async function downloadReportPdf(reportNumber, button) {
     clone.classList.add("pdf-export-report");
     clone.removeAttribute("id");
     clone.querySelectorAll("button").forEach((item) => item.remove());
+    flattenPdfTables(clone);
     stage.append(clone);
     document.body.append(stage);
     const pdfBlob = await renderCompletePdf(clone);
