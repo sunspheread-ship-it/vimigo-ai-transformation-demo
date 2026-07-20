@@ -1140,7 +1140,7 @@ form {
 }
 
 .pdf-export-stage {
-  position: fixed;
+  position: absolute;
   left: -100000px;
   top: 0;
   width: 760px;

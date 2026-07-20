@@ -130,6 +130,7 @@ test("direct PDF clone carries its own print-style formatting class", () => {
   assert.match(stylesSource, /\.pdf-export-report\.report-sheet/);
   assert.match(stylesSource, /\.pdf-export-report \.report-meta/);
   assert.doesNotMatch(stylesSource, /\.pdf-export-stage \.report-sheet/);
+  assert.match(stylesSource, /\.pdf-export-stage\s*\{[^}]*position:\s*absolute/s);
 });
 
 test("workflow candidates use one required entry with optional expansion to three", () => {
