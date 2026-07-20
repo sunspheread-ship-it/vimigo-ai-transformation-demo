@@ -771,6 +771,7 @@ async function downloadReportPdf(reportNumber, button) {
     stage = document.createElement("div");
     stage.className = "pdf-export-stage";
     const clone = report.cloneNode(true);
+    clone.classList.add("pdf-export-report");
     clone.removeAttribute("id");
     clone.querySelectorAll("button").forEach((item) => item.remove());
     stage.append(clone);

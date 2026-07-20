@@ -1135,7 +1135,7 @@ form {
   background: #fff;
   color: #172033;
 }
-.pdf-export-stage .report-sheet {
+.pdf-export-report.report-sheet {
   display: block;
   width: 760px;
   min-height: 0;
@@ -1148,78 +1148,78 @@ form {
   box-shadow: none;
   font-size: 12px;
 }
-.pdf-export-stage .report-head,
-.pdf-export-stage .report-section-head,
-.pdf-export-stage .report-footer {
+.pdf-export-report .report-head,
+.pdf-export-report .report-section-head,
+.pdf-export-report .report-footer {
   border-color: #ccd6df;
 }
-.pdf-export-stage .report-head h2,
-.pdf-export-stage .report-meta b,
-.pdf-export-stage .detail-table td b,
-.pdf-export-stage .finding-grid b,
-.pdf-export-stage .priority-list b,
-.pdf-export-stage .workflow-detail h3,
-.pdf-export-stage .decision-box b {
+.pdf-export-report .report-head h2,
+.pdf-export-report .report-meta b,
+.pdf-export-report .detail-table td b,
+.pdf-export-report .finding-grid b,
+.pdf-export-report .priority-list b,
+.pdf-export-report .workflow-detail h3,
+.pdf-export-report .decision-box b {
   color: #172033;
 }
-.pdf-export-stage .report-head p,
-.pdf-export-stage .report-head small,
-.pdf-export-stage .source-legend,
-.pdf-export-stage .report-meta span,
-.pdf-export-stage .report-section-head p,
-.pdf-export-stage .finding-grid small,
-.pdf-export-stage .finding-grid em,
-.pdf-export-stage .finding-grid p,
-.pdf-export-stage .priority-list p,
-.pdf-export-stage .workflow-detail header p,
-.pdf-export-stage .workflow-detail header small,
-.pdf-export-stage .method p,
-.pdf-export-stage .mechanism p,
-.pdf-export-stage .stage-banner p,
-.pdf-export-stage .financial p,
-.pdf-export-stage .timeline p,
-.pdf-export-stage .primary-route p,
-.pdf-export-stage .decision-box p,
-.pdf-export-stage .decision-box li,
-.pdf-export-stage .detail-table td,
-.pdf-export-stage .report-footer,
-.pdf-export-stage li {
+.pdf-export-report .report-head p,
+.pdf-export-report .report-head small,
+.pdf-export-report .source-legend,
+.pdf-export-report .report-meta span,
+.pdf-export-report .report-section-head p,
+.pdf-export-report .finding-grid small,
+.pdf-export-report .finding-grid em,
+.pdf-export-report .finding-grid p,
+.pdf-export-report .priority-list p,
+.pdf-export-report .workflow-detail header p,
+.pdf-export-report .workflow-detail header small,
+.pdf-export-report .method p,
+.pdf-export-report .mechanism p,
+.pdf-export-report .stage-banner p,
+.pdf-export-report .financial p,
+.pdf-export-report .timeline p,
+.pdf-export-report .primary-route p,
+.pdf-export-report .decision-box p,
+.pdf-export-report .decision-box li,
+.pdf-export-report .detail-table td,
+.pdf-export-report .report-footer,
+.pdf-export-report li {
   color: #526171;
 }
-.pdf-export-stage .report-meta,
-.pdf-export-stage .finding-grid > div,
-.pdf-export-stage .priority-list section,
-.pdf-export-stage .mechanism-chain > div,
-.pdf-export-stage .workflow-detail,
-.pdf-export-stage .workflow-assessment > div,
-.pdf-export-stage .dependency-grid > div,
-.pdf-export-stage .requirement-list li,
-.pdf-export-stage .decision-box,
-.pdf-export-stage .breakdown p,
-.pdf-export-stage .method,
-.pdf-export-stage .mechanism,
-.pdf-export-stage .stage-banner,
-.pdf-export-stage .target-card,
-.pdf-export-stage .primary-route,
-.pdf-export-stage .financial,
-.pdf-export-stage .three-cards section,
-.pdf-export-stage .workflow-reports section,
-.pdf-export-stage .timeline section {
+.pdf-export-report .report-meta,
+.pdf-export-report .finding-grid > div,
+.pdf-export-report .priority-list section,
+.pdf-export-report .mechanism-chain > div,
+.pdf-export-report .workflow-detail,
+.pdf-export-report .workflow-assessment > div,
+.pdf-export-report .dependency-grid > div,
+.pdf-export-report .requirement-list li,
+.pdf-export-report .decision-box,
+.pdf-export-report .breakdown p,
+.pdf-export-report .method,
+.pdf-export-report .mechanism,
+.pdf-export-report .stage-banner,
+.pdf-export-report .target-card,
+.pdf-export-report .primary-route,
+.pdf-export-report .financial,
+.pdf-export-report .three-cards section,
+.pdf-export-report .workflow-reports section,
+.pdf-export-report .timeline section {
   background: #f4f7fa;
   border-color: #d6e0e8;
 }
-.pdf-export-stage .detail-table-wrap {
+.pdf-export-report .detail-table-wrap {
   overflow: visible;
   border-color: #ccd6df;
 }
-.pdf-export-stage .detail-table {
+.pdf-export-report .detail-table {
   min-width: 0;
   font-size: 10px;
 }
-.pdf-export-stage .detail-table th {
+.pdf-export-report .detail-table th {
   background: #e8eef4;
   color: #172033;
 }
-.pdf-export-stage .detail-table td {
+.pdf-export-report .detail-table td {
   border-color: #d6e0e8;
 }

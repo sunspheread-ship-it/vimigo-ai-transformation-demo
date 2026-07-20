@@ -76,6 +76,13 @@ test("report pack offers six direct PDF download buttons without ZIP or print", 
   assert.doesNotMatch(appSource, /window\.print\(\)|window\.JSZip/);
 });
 
+test("direct PDF clone carries its own print-style formatting class", () => {
+  assert.match(appSource, /clone\.classList\.add\("pdf-export-report"\)/);
+  assert.match(stylesSource, /\.pdf-export-report\.report-sheet/);
+  assert.match(stylesSource, /\.pdf-export-report \.report-meta/);
+  assert.doesNotMatch(stylesSource, /\.pdf-export-stage \.report-sheet/);
+});
+
 test("workflow candidates use one required entry with optional expansion to three", () => {
   assert.match(appSource, /data-add-bottleneck/);
   assert.match(appSource, /data-remove-bottleneck/);
