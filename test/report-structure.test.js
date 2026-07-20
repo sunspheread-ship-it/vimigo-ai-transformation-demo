@@ -65,14 +65,15 @@ test("hero score ring keeps a perfect square aspect ratio", () => {
   assert.doesNotMatch(stylesSource, /\.score-orbit\s*\{[^}]*min-height:/s);
 });
 
-test("complete report pack exports six separate PDFs in one ZIP", () => {
-  assert.match(reportsSource, /data-download-all/);
-  assert.match(reportsSource, /six separately named PDF files/);
-  assert.match(appSource, /reports\.length !== 6/);
+test("report pack offers six direct PDF download buttons without ZIP or print", () => {
+  assert.match(reportsSource, /reportLabels/);
+  assert.match(reportsSource, /data-download-report/);
+  assert.match(reportsSource, /no ZIP file and no print screen/);
+  assert.match(appSource, /downloadReportPdf\(reportNumber, button\)/);
   assert.match(appSource, /outputPdf\("blob"\)/);
-  assert.match(appSource, /new window\.JSZip\(\)/);
-  assert.match(appSource, /zip\.file\(`/);
-  assert.match(appSource, /generateAsync\(\{ type: "blob" \}\)/);
+  assert.match(appSource, /link\.download = `\$\{reportNumber\} - \$\{title\} - \$\{company\}\.pdf`/);
+  assert.doesNotMatch(reportsSource, /data-download-all|\.zip/);
+  assert.doesNotMatch(appSource, /window\.print\(\)|window\.JSZip/);
 });
 
 test("workflow candidates use one required entry with optional expansion to three", () => {

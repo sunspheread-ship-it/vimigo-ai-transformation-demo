@@ -79,7 +79,7 @@ const pending = (language) =>
   r(language, "Requires CSM validation", "需要 CSM 验证");
 
 function reportHeader(number, title, subtitle) {
-  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · GENERATED FROM THIS CASE · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${esc(subtitle)}</p></div><button class="ghost" data-print="${number}">Preview / Save draft PDF</button></header>`;
+  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · GENERATED FROM THIS CASE · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${esc(subtitle)}</p></div><button class="ghost" data-download-report="${number}">Download PDF</button></header>`;
 }
 
 function reportMeta(state, language) {
@@ -385,18 +385,23 @@ export function buildDetailedReports(ctx) {
   );
   const downloadTitle = r(
     language,
-    "Download the complete six-file report pack",
-    "下载完整六份报告",
+    "Download six separate PDF reports",
+    "分别下载六份 PDF 报告",
   );
   const downloadHelp = r(
     language,
-    "One ZIP download containing six separately named PDF files (01-06).",
-    "一次下载 ZIP 压缩包，内含六份独立命名的 PDF（01-06）。",
+    "Choose a report below. Each button downloads one PDF directly—no ZIP file and no print screen.",
+    "请选择以下报告。每个按钮会直接下载一份 PDF——无需 ZIP 压缩包，也不会打开打印画面。",
   );
-  const downloadLabel = r(
-    language,
-    "Download all 6 PDFs (.zip)",
-    "下载全部 6 份 PDF（ZIP）",
-  );
-  return `<section class="reports-shell"><header class="screen-header"><span>04</span><div><p>VIMIGO AI TRANSFORMATION DAY</p><h1>${r(language, "Six Detailed Reports", "六份详细报告")}</h1><small>${intro}</small></div></header>${ctx.state.submitted ? `<div class="confirmation">✓ ${ctx.t("confirmed")}</div>` : ""}<div class="report-index">${reports.map((_, i) => `<a href="#report-${i + 1}">0${i + 1}</a>`).join("")}</div><div class="download-pack"><div><b>${downloadTitle}</b><p>${downloadHelp}</p><small data-download-status aria-live="polite"></small></div><button type="button" class="primary" data-download-all>${downloadLabel}</button></div>${reports.map((report, i) => report.replace('class="report-sheet', `id="report-${i + 1}" class="report-sheet`)).join("")}<div class="submit-bar"><div><b>${ctx.state.submitted ? ctx.t("confirmed") : r(language, "PUBLIC DEMO - LOCAL SAVE ONLY", "公开示范 - 仅本机保存")}</b><p>${r(language, "This GitHub demo does not transmit client data or notify a CSM. Use the private pilot link for real submissions.", "此 GitHub 示范不会传送客户资料，也不会通知 CSM。真实提交必须使用私人试点链接。")}</p></div><button class="primary" data-submit ${ctx.state.submitted ? "disabled" : ""}>${ctx.t("submit")}</button></div></section>`;
+  const reportLabels =
+    language === "en"
+      ? ["Score Report", "Stage Report", "Six OS Report", "AI Workflow Report", "90-Day Plan", "Business Model Report"]
+      : ["转型评分报告", "转型阶段报告", "六大 OS 报告", "AI 工作流程报告", "90 天计划", "商业模式报告"];
+  const downloadButtons = reportLabels
+    .map(
+      (label, index) =>
+        `<button type="button" class="report-download-button" data-download-report="0${index + 1}"><span>0${index + 1}</span><b>${label}</b><small>${r(language, "Download PDF", "下载 PDF")}</small></button>`,
+    )
+    .join("");
+  return `<section class="reports-shell"><header class="screen-header"><span>04</span><div><p>VIMIGO AI TRANSFORMATION DAY</p><h1>${r(language, "Six Detailed Reports", "六份详细报告")}</h1><small>${intro}</small></div></header>${ctx.state.submitted ? `<div class="confirmation">✓ ${ctx.t("confirmed")}</div>` : ""}<div class="report-index">${reports.map((_, i) => `<a href="#report-${i + 1}">0${i + 1}</a>`).join("")}</div><div class="download-pack"><div><b>${downloadTitle}</b><p>${downloadHelp}</p><small data-download-status aria-live="polite"></small></div><div class="report-download-buttons">${downloadButtons}</div></div>${reports.map((report, i) => report.replace('class="report-sheet', `id="report-${i + 1}" class="report-sheet`)).join("")}<div class="submit-bar"><div><b>${ctx.state.submitted ? ctx.t("confirmed") : r(language, "PUBLIC DEMO - LOCAL SAVE ONLY", "公开示范 - 仅本机保存")}</b><p>${r(language, "This GitHub demo does not transmit client data or notify a CSM. Use the private pilot link for real submissions.", "此 GitHub 示范不会传送客户资料，也不会通知 CSM。真实提交必须使用私人试点链接。")}</p></div><button class="primary" data-submit ${ctx.state.submitted ? "disabled" : ""}>${ctx.t("submit")}</button></div></section>`;
 }

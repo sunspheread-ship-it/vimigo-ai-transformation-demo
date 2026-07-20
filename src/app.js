@@ -655,7 +655,7 @@ function planScreen() {
 }
 
 function reportHeader(number, title, subtitle) {
-  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${subtitle}</p></div><button class="ghost" data-print="${number}">${tr("print")}</button></header>`;
+  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${subtitle}</p></div><button class="ghost" data-download-report="${number}">Download PDF</button></header>`;
 }
 function factStrip() {
   return `<div class="source-legend"><span><i class="fact"></i>${tr("facts")}</span><span><i class="assess"></i>${tr("assessment")}</span><span><i class="hyp"></i>${tr("hypothesis")}</span></div>`;
@@ -734,9 +734,9 @@ function safeFileName(value, fallback = "Vimigo report") {
   return (cleaned || fallback).slice(0, 100);
 }
 
-async function downloadAllReportPdfs(button) {
+async function downloadReportPdf(reportNumber, button) {
   const status = app.querySelector("[data-download-status]");
-  const originalLabel = button.textContent;
+  const originalMarkup = button.innerHTML;
   let stage;
 
   const setStatus = (message) => {
@@ -744,90 +744,86 @@ async function downloadAllReportPdfs(button) {
   };
 
   try {
-    if (!window.html2pdf || !window.JSZip) {
+    if (!window.html2pdf) {
       throw new Error("The PDF generator did not load. Please refresh and try again.");
     }
 
-    const reports = [...app.querySelectorAll("[data-report]")];
-    if (reports.length !== 6) {
-      throw new Error(`Expected six reports but found ${reports.length}.`);
+    const report = app.querySelector(`[data-report="${reportNumber}"]`);
+    if (!report) {
+      throw new Error(`Report ${reportNumber} was not found.`);
     }
 
-    button.disabled = true;
-    const zip = new window.JSZip();
+    const matchingButtons = [
+      ...app.querySelectorAll(`[data-download-report="${reportNumber}"]`),
+    ];
+    matchingButtons.forEach((item) => {
+      item.disabled = true;
+    });
     const company = safeFileName(state.pre.company, "Client company");
+    const title = safeFileName(
+      report.querySelector(".report-head h2")?.textContent,
+      `Report ${reportNumber}`,
+    );
 
-    for (let index = 0; index < reports.length; index += 1) {
-      const report = reports[index];
-      const number = String(index + 1).padStart(2, "0");
-      const title = safeFileName(
-        report.querySelector(".report-head h2")?.textContent,
-        `Report ${number}`,
-      );
+    button.textContent = `Creating PDF ${reportNumber}...`;
+    setStatus(`Preparing ${reportNumber} - ${title}`);
 
-      button.textContent = `Creating PDF ${index + 1} / 6...`;
-      setStatus(`Preparing ${number} - ${title}`);
+    stage = document.createElement("div");
+    stage.className = "pdf-export-stage";
+    const clone = report.cloneNode(true);
+    clone.removeAttribute("id");
+    clone.querySelectorAll("button").forEach((item) => item.remove());
+    stage.append(clone);
+    document.body.append(stage);
 
-      stage = document.createElement("div");
-      stage.className = "pdf-export-stage";
-      const clone = report.cloneNode(true);
-      clone.removeAttribute("id");
-      clone.querySelectorAll("button").forEach((item) => item.remove());
-      stage.append(clone);
-      document.body.append(stage);
+    const pdfBlob = await window
+      .html2pdf()
+      .set({
+        margin: [7, 7, 9, 7],
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+        },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: {
+          mode: ["css", "legacy"],
+          avoid: [
+            ".report-head",
+            ".report-meta",
+            ".finding-grid > div",
+            ".priority-list section",
+            ".workflow-detail",
+            ".decision-box",
+            "tr",
+          ],
+        },
+      })
+      .from(clone)
+      .outputPdf("blob");
 
-      const pdfBlob = await window
-        .html2pdf()
-        .set({
-          margin: [7, 7, 9, 7],
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            logging: false,
-          },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: {
-            mode: ["css", "legacy"],
-            avoid: [
-              ".report-head",
-              ".report-meta",
-              ".finding-grid > div",
-              ".priority-list section",
-              ".workflow-detail",
-              ".decision-box",
-              "tr",
-            ],
-          },
-        })
-        .from(clone)
-        .outputPdf("blob");
-
-      zip.file(`${number} - ${title} - ${company}.pdf`, pdfBlob);
-      stage.remove();
-      stage = null;
-    }
-
-    button.textContent = "Packaging 6 PDFs...";
-    setStatus("Packaging six separate PDF files into one ZIP...");
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    const downloadUrl = URL.createObjectURL(zipBlob);
+    const downloadUrl = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
     link.href = downloadUrl;
-    link.download = `Vimigo - Six Reports - ${company}.zip`;
+    link.download = `${reportNumber} - ${title} - ${company}.pdf`;
     document.body.append(link);
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-    setStatus("Complete: your ZIP contains six separate PDF files.");
+    setStatus(`Complete: Report ${reportNumber} downloaded as a PDF.`);
   } catch (error) {
     console.error(error);
     setStatus(`Download failed: ${error.message}`);
   } finally {
     if (stage) stage.remove();
-    button.disabled = false;
-    button.textContent = originalLabel;
+    app
+      .querySelectorAll(`[data-download-report="${reportNumber}"]`)
+      .forEach((item) => {
+        item.disabled = false;
+      });
+    button.innerHTML = originalMarkup;
   }
 }
 function validate(step) {
@@ -932,9 +928,12 @@ app.addEventListener("click", (event) => {
     }
     return;
   }
-  const downloadAllButton = event.target.closest("[data-download-all]");
-  if (downloadAllButton) {
-    downloadAllReportPdfs(downloadAllButton);
+  const downloadReportButton = event.target.closest("[data-download-report]");
+  if (downloadReportButton) {
+    downloadReportPdf(
+      downloadReportButton.dataset.downloadReport,
+      downloadReportButton,
+    );
     return;
   }
   const lang = event.target.closest("[data-lang]")?.dataset.lang;
@@ -1004,13 +1003,6 @@ app.addEventListener("click", (event) => {
     window.scrollTo({ top: 0 });
     return;
   }
-  const report = event.target.closest("[data-print]")?.dataset.print;
-  if (report) {
-    document.body.dataset.printReport = report;
-    window.print();
-    delete document.body.dataset.printReport;
-    return;
-  }
   if (event.target.closest("[data-submit]")) {
     state.submitted = true;
     persist();
@@ -1018,8 +1010,4 @@ app.addEventListener("click", (event) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 });
-window.addEventListener(
-  "afterprint",
-  () => delete document.body.dataset.printReport,
-);
 render();
