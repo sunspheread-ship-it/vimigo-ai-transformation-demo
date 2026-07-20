@@ -1245,37 +1245,3 @@ form {
 .pdf-export-report .detail-table td {
   border-color: #d6e0e8;
 }
-.pdf-export-report .report-head,
-.pdf-export-report .report-meta,
-.pdf-export-report .source-legend,
-.pdf-export-report .score-hero,
-.pdf-export-report .breakdown,
-.pdf-export-report .finding-grid,
-.pdf-export-report .finding-grid > div,
-.pdf-export-report .priority-list section,
-.pdf-export-report .mechanism-chain,
-.pdf-export-report .three-cards,
-.pdf-export-report .three-cards section,
-.pdf-export-report .workflow-detail,
-.pdf-export-report .workflow-assessment,
-.pdf-export-report .workflow-assessment > div,
-.pdf-export-report .dependency-grid > div,
-.pdf-export-report .requirement-list li,
-.pdf-export-report .timeline,
-.pdf-export-report .timeline section,
-.pdf-export-report .target-card,
-.pdf-export-report .primary-route,
-.pdf-export-report .financial,
-.pdf-export-report .decision-box,
-.pdf-export-report .report-footer,
-.pdf-export-report thead,
-.pdf-export-report tr {
-  break-inside: avoid !important;
-  page-break-inside: avoid !important;
-}
-.pdf-export-report .report-section-head {
-  break-inside: avoid !important;
-  break-after: avoid !important;
-  page-break-inside: avoid !important;
-  page-break-after: avoid !important;
-}

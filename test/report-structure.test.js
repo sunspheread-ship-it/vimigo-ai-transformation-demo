@@ -87,7 +87,6 @@ test("PDF generation is globally queued and protects page-break content", () => 
   assert.match(appSource, /let pdfDownloadInProgress = false/);
   assert.match(appSource, /if \(pdfDownloadInProgress\)/);
   assert.match(appSource, /querySelectorAll\("\[data-download-report\]"\)/);
-  assert.match(stylesSource, /\.pdf-export-report tr\s*\{[^}]*break-inside:\s*avoid/s);
   assert.match(reportsSource, /function addReportPageBreaks/);
   assert.match(reportsSource, /class="pdf-page-break"/);
   assert.match(stylesSource, /\.pdf-export-report \.pdf-page-break\s*\{[^}]*display:\s*block/s);
