@@ -1156,8 +1156,6 @@ form {
   height: 0;
   margin: 0;
   padding: 0;
-  break-before: page;
-  page-break-before: always;
 }
 .pdf-export-report.report-sheet {
   display: block;

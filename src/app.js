@@ -738,6 +738,21 @@ function safeFileName(value, fallback = "Vimigo report") {
   return (cleaned || fallback).slice(0, 100);
 }
 
+function alignPdfSectionsToPages(report) {
+  const printableWidthMm = 210 - 14;
+  const printableHeightMm = 297 - 7 - 9;
+  const pageHeightPx = report.scrollWidth * (printableHeightMm / printableWidthMm);
+  const reportTop = report.getBoundingClientRect().top;
+
+  report.querySelectorAll(".pdf-page-break").forEach((marker) => {
+    marker.style.height = "0px";
+    const offset = marker.getBoundingClientRect().top - reportTop;
+    const remainder = ((offset % pageHeightPx) + pageHeightPx) % pageHeightPx;
+    const spacer = remainder < 2 ? 0 : pageHeightPx - remainder;
+    marker.style.height = `${spacer}px`;
+  });
+}
+
 async function downloadReportPdf(reportNumber, button) {
   const status = app.querySelector("[data-download-status]");
   if (pdfDownloadInProgress) {
@@ -793,6 +808,7 @@ async function downloadReportPdf(reportNumber, button) {
     clone.querySelectorAll("button").forEach((item) => item.remove());
     stage.append(clone);
     document.body.append(stage);
+    alignPdfSectionsToPages(clone);
 
     const pdfBlob = await window
       .html2pdf()
@@ -806,37 +822,7 @@ async function downloadReportPdf(reportNumber, button) {
           logging: false,
         },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: {
-          mode: ["css"],
-          avoid: [
-            ".report-head",
-            ".report-meta",
-            ".source-legend",
-            ".score-hero",
-            ".breakdown",
-            ".finding-grid",
-            ".finding-grid > div",
-            ".report-section-head",
-            ".priority-list section",
-            ".mechanism-chain",
-            ".three-cards",
-            ".three-cards section",
-            ".workflow-detail",
-            ".workflow-assessment",
-            ".workflow-assessment > div",
-            ".dependency-grid > div",
-            ".requirement-list li",
-            ".timeline",
-            ".timeline section",
-            ".target-card",
-            ".primary-route",
-            ".financial",
-            ".decision-box",
-            ".report-footer",
-            "thead",
-            "tr",
-          ],
-        },
+        pagebreak: { mode: [] },
       })
       .from(clone)
       .outputPdf("blob");
