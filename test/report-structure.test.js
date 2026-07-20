@@ -91,6 +91,9 @@ test("PDF generation is globally queued and protects page-break content", () => 
     assert.ok(appSource.includes(`"${selector}"`));
   }
   assert.match(stylesSource, /\.pdf-export-report tr\s*\{[^}]*break-inside:\s*avoid/s);
+  assert.match(reportsSource, /function addReportPageBreaks/);
+  assert.match(reportsSource, /html2pdf__page-break pdf-page-break/);
+  assert.match(stylesSource, /\.pdf-export-report \.pdf-page-break\s*\{[^}]*display:\s*block/s);
 });
 
 test("report page exposes only the six primary PDF download controls", () => {

@@ -1148,6 +1148,15 @@ form {
   background: #fff;
   color: #172033;
 }
+.pdf-page-break {
+  display: none;
+}
+.pdf-export-report .pdf-page-break {
+  display: block;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
 .pdf-export-report.report-sheet {
   display: block;
   width: 760px;

@@ -244,6 +244,44 @@ function localizeReportHtml(html, language) {
     html,
   );
 }
+
+function addReportPageBreaks(html, reportNumber) {
+  const breakBefore = {
+    "01": [
+      "Executive interpretation",
+      "Six OS component detail",
+      "How Vimigo is expected to increase performance",
+    ],
+    "02": [
+      "Three blockers holding back the next stage",
+      "30-day stage-readiness actions",
+    ],
+    "03": [
+      "Six OS assessment detail",
+      "First three OS areas requiring attention",
+    ],
+    "04": ['<section class="workflow-detail">'],
+    "05": [
+      '<div class="target-card">',
+      "13-week operating rhythm",
+      "Weekly management review agenda",
+    ],
+    "06": [
+      "How the recommended route is expected to improve performance",
+      "Maximum three business-model improvement opportunities",
+      "Scope boundary and optional later stages",
+    ],
+  };
+  return (breakBefore[reportNumber] || []).reduce((output, marker) => {
+    const needle = marker.startsWith("<")
+      ? marker
+      : `<header class="report-section-head"><h3>${marker}`;
+    return output.replace(
+      needle,
+      `<div class="html2pdf__page-break pdf-page-break" aria-hidden="true"></div>${needle}`,
+    );
+  }, html);
+}
 const score100 = (rating) => Number(rating || 0) * 20;
 const pending = (language) =>
   r(language, "Requires CSM validation", "需要 CSM 验证");
@@ -558,7 +596,9 @@ export function buildDetailedReports(ctx) {
     workflowReport(full),
     masterPlanReport(full),
     productReport(full),
-  ].map((report) => localizeReportHtml(report, language));
+  ].map((report, index) =>
+    localizeReportHtml(addReportPageBreaks(report, `0${index + 1}`), language),
+  );
   const intro = r(
     language,
     "Six personalised consulting drafts generated from the form answers in this case. Final PDFs are exported only after CSM review and approval.",
