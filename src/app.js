@@ -770,9 +770,13 @@ async function renderCompletePdf(report) {
   const canvas = await worker.get("canvas");
 
   await worker.toPdf();
-  const generatedPdf = await worker.get("pdf");
-  const PdfConstructor = generatedPdf.constructor;
-  const pdf = new PdfConstructor(options.jsPDF);
+  const pdf = await worker.get("pdf");
+  while (pdf.internal.getNumberOfPages() > 1) {
+    pdf.deletePage(pdf.internal.getNumberOfPages());
+  }
+  pdf.setPage(1);
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(0, 0, 210, 297, "F");
   const pageWidthMm = 210 - 14;
   const pageHeightMm = 297 - 7 - 9;
   const pageHeightPx = Math.floor(canvas.width * (pageHeightMm / pageWidthMm));

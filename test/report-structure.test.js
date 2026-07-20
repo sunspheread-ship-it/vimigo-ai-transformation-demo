@@ -93,6 +93,7 @@ test("PDF generation is globally queued and protects page-break content", () => 
   assert.match(appSource, /function alignPdfSectionsToPages/);
   assert.match(appSource, /async function renderCompletePdf/);
   assert.match(appSource, /context\.drawImage\(/);
+  assert.match(appSource, /pdf\.deletePage\(/);
   assert.match(appSource, /pagebreak:\s*\{\s*mode:\s*\[\]\s*\}/);
 });
 
