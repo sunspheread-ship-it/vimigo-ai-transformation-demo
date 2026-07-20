@@ -252,8 +252,8 @@ function addReportPageBreaks(html, reportNumber) {
       "执行摘要",
       "Six OS component detail",
       "六大 OS 评分明细",
-      "How Vimigo is expected to increase performance",
-      "Vimigo 如何提升绩效",
+      "Top three performance constraints",
+      "三大绩效限制",
     ],
     "02": [
       "Three blockers holding back the next stage",
