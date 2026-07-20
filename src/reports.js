@@ -254,6 +254,8 @@ function addReportPageBreaks(html, reportNumber) {
       "六大 OS 评分明细",
       "Top three performance constraints",
       "三大绩效限制",
+      "Method, limitations and approval decisions",
+      "方法、限制与批准事项",
     ],
     "02": [
       "Three blockers holding back the next stage",
@@ -290,7 +292,7 @@ function addReportPageBreaks(html, reportNumber) {
       : `<header class="report-section-head"><h3>${marker}`;
     return output.replace(
       needle,
-      `<div class="html2pdf__page-break pdf-page-break" aria-hidden="true"></div>${needle}`,
+      `<div class="pdf-page-break" aria-hidden="true"></div>${needle}`,
     );
   }, html);
 }

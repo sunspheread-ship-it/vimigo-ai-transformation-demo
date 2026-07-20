@@ -4,7 +4,7 @@ import {
   getStage,
 } from "./scoring.js";
 import { initialState, osKeys } from "./sample-data.js";
-import { buildDetailedReports } from "./reports.js?v=20260720-4";
+import { buildDetailedReports } from "./reports.js?v=20260720-5";
 
 const STORAGE_KEY = "vimigo-transformation-demo-v2";
 let pdfDownloadInProgress = false;
@@ -807,7 +807,7 @@ async function downloadReportPdf(reportNumber, button) {
         },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: {
-          mode: ["css", "legacy"],
+          mode: ["css"],
           avoid: [
             ".report-head",
             ".report-meta",
