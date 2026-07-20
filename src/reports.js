@@ -223,6 +223,7 @@ function osReport(ctx) {
 
 function workflowReport(ctx) {
   const { state, language, t } = ctx;
+  const candidateCount = state.diagnostic.bottlenecks.length;
   const portfolioRows = state.diagnostic.bottlenecks.map((item, index) => [
     `0${index + 1}`,
     esc(item.issue),
@@ -250,7 +251,7 @@ function workflowReport(ctx) {
         )}<div class="workflow-assessment"><div><b>Readiness</b><p>${esc(item.readiness)}</p></div><div><b>Primary risk</b><p>${esc(item.risk)}</p></div><div><b>Expected operational benefit</b><p>${esc(item.impact)}</p></div></div><aside class="warning">Candidate only. Data access, privacy, approved rules, exception handling and test acceptance must be confirmed before implementation.</aside></section>`,
     )
     .join("");
-  return `<article class="report-sheet detailed-report" data-report="04">${reportHeader("04", "Top Three AI Workflow Priority Report", "Candidate workflows · readiness and risk review required")}${reportMeta(state, language)}${factStrip(t)}${section(r(language, "Portfolio priority summary", "流程优先级摘要"), r(language, "Priority reflects workshop selection, not technical approval or completed implementation.", "优先级来自工作坊选择，并不代表技术批准或已经实施。"))}${table(["Priority", "Business problem", "Owner", "Readiness", "Success metric", "Primary risk"], portfolioRows)}${cards}${section(r(language, "Implementation approval gate", "实施批准关卡"))}<div class="decision-box"><ul><li>Confirm lawful and approved access to every required data source.</li><li>Approve response rules, human decisions and exception routes.</li><li>Define a test set, baseline, target and rollback procedure.</li><li>Name an accountable business owner; technology does not own the result.</li><li>Record audit evidence and review the result before scaling.</li></ul></div>${reportFooter("04", state, language)}</article>`;
+  return `<article class="report-sheet detailed-report" data-report="04">${reportHeader("04", "Top Three AI Workflow Priority Report", `${candidateCount} candidate workflow${candidateCount === 1 ? "" : "s"} captured · readiness and risk review required`)}${reportMeta(state, language)}${factStrip(t)}${section(r(language, "Portfolio priority summary", "流程优先级摘要"), r(language, `The workshop captured ${candidateCount} distinct priority workflow${candidateCount === 1 ? "" : "s"}, up to a maximum of three. Priority reflects workshop selection, not technical approval or completed implementation.`, `工作坊记录了 ${candidateCount} 个不同的优先工作流程（最多三个）。优先级来自工作坊选择，并不代表技术批准或已经实施。`))}${table(["Priority", "Business problem", "Owner", "Readiness", "Success metric", "Primary risk"], portfolioRows)}${cards}${section(r(language, "Implementation approval gate", "实施批准关卡"))}<div class="decision-box"><ul><li>Confirm lawful and approved access to every required data source.</li><li>Approve response rules, human decisions and exception routes.</li><li>Define a test set, baseline, target and rollback procedure.</li><li>Name an accountable business owner; technology does not own the result.</li><li>Record audit evidence and review the result before scaling.</li></ul></div>${reportFooter("04", state, language)}</article>`;
 }
 
 function masterPlanReport(ctx) {
@@ -312,7 +313,7 @@ function masterPlanReport(ctx) {
       esc(guidance.os[language][key].title),
       `${rating}/5`,
       esc(state.plan.hypotheses[index]?.validation),
-      esc(state.diagnostic.bottlenecks[index]?.owner),
+      esc(state.diagnostic.bottlenecks[index]?.owner || state.plan.owner),
       esc(state.plan.hypotheses[index]?.metric),
     ]),
   )}${section(r(language, "Weekly management review agenda", "每周管理复盘议程"))}<ol class="requirement-list"><li>Confirm the result metric and data cut-off.</li><li>Review completed and missed key actions by owner.</li><li>Review workflow exceptions, risks and customer-impact cases.</li><li>Decide one corrective action with an owner and due date.</li><li>Recognise verified behaviour or results using the agreed rule.</li><li>Record decisions and carry unresolved items into the next review.</li></ol><aside class="decision-box"><b>Day 90 decision</b><p>Management decides whether to stop, continue as DIY, activate a narrow Vimigo workspace, or approve deeper implementation. No expansion is automatic.</p></aside>${reportFooter("05", state, language)}</article>`;

@@ -74,3 +74,12 @@ test("complete report pack exports six separate PDFs in one ZIP", () => {
   assert.match(appSource, /zip\.file\(`/);
   assert.match(appSource, /generateAsync\(\{ type: "blob" \}\)/);
 });
+
+test("workflow candidates use one required entry with optional expansion to three", () => {
+  assert.match(appSource, /data-add-bottleneck/);
+  assert.match(appSource, /data-remove-bottleneck/);
+  assert.match(appSource, /bottlenecks\.length < 3/);
+  assert.match(appSource, /Add another bottleneck \(optional\)/);
+  assert.match(appSource, /Start with the single most important bottleneck/);
+  assert.match(reportsSource, /candidateCount = state\.diagnostic\.bottlenecks\.length/);
+});

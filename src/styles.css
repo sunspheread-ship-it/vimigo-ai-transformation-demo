@@ -756,6 +756,55 @@ form {
   border-radius: 10px;
   margin-bottom: 18px;
 }
+.workflow-candidate-form > header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+}
+.remove-candidate {
+  padding: 7px 11px;
+  color: var(--coral);
+  border-color: #693545;
+}
+.add-candidate {
+  width: 100%;
+  margin-top: 12px;
+  padding: 18px;
+  border: 1px dashed var(--cyan);
+  border-radius: 10px;
+  background: #071e33;
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.add-candidate:hover,
+.add-candidate:focus-visible {
+  background: #0a2944;
+  border-style: solid;
+}
+.add-candidate > span {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: #04111f;
+  font-size: 20px;
+}
+.add-candidate small {
+  display: block;
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-weight: 500;
+}
+.candidate-limit {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
 .site-footer {
   padding: 32px clamp(18px, 4vw, 56px);
   border-top: 1px solid var(--line);

@@ -7,6 +7,23 @@ import { initialState, osKeys } from "./sample-data.js";
 import { buildDetailedReports } from "./reports.js";
 
 const STORAGE_KEY = "vimigo-transformation-demo-v2";
+const workflowFields = [
+  "issue",
+  "impact",
+  "trigger",
+  "inputs",
+  "aiTask",
+  "humanApproval",
+  "owner",
+  "exceptions",
+  "metric",
+  "readiness",
+  "risk",
+];
+
+function blankWorkflowCandidate() {
+  return Object.fromEntries(workflowFields.map((field) => [field, ""]));
+}
 const copy = {
   en: {
     demo: "PUBLIC DEMO · DATA STAYS ON THIS DEVICE",
@@ -419,10 +436,13 @@ function loadState() {
           ...base.diagnostic.osRatings,
           ...(saved.diagnostic?.osRatings || {}),
         },
-        bottlenecks: base.diagnostic.bottlenecks.map((item, index) => ({
-          ...item,
-          ...(saved.diagnostic?.bottlenecks?.[index] || {}),
-        })),
+        bottlenecks:
+          Array.isArray(saved.diagnostic?.bottlenecks) &&
+          saved.diagnostic.bottlenecks.length
+            ? saved.diagnostic.bottlenecks
+                .slice(0, 3)
+                .map((item) => ({ ...blankWorkflowCandidate(), ...item }))
+            : base.diagnostic.bottlenecks,
       },
       plan: {
         ...base.plan,
@@ -527,7 +547,27 @@ function ratingRow(guidance, path) {
 
 function workflowCandidateForm(item, index) {
   const base = `diagnostic.bottlenecks.${index}`;
-  return `<section class="workflow-candidate-form"><header><span>0${index + 1}</span><div><b>${state.language === "en" ? "AI workflow candidate" : "AI 工作流程候选"}</b><small>${state.language === "en" ? "Candidate only - not yet implemented" : "仅为候选方案，尚未实施"}</small></div></header><div class="two-col">${input(`${base}.issue`, "Business problem", { required: true })}${input(`${base}.impact`, "Business impact", { required: true })}${input(`${base}.trigger`, "Workflow trigger", { required: true })}${input(`${base}.inputs`, "Required inputs / data", { required: true, multiline: true })}${input(`${base}.aiTask`, "Proposed AI task", { required: true, multiline: true })}${input(`${base}.humanApproval`, "Human approval point", { required: true, multiline: true })}${input(`${base}.owner`, "Accountable owner", { required: true })}${input(`${base}.exceptions`, "Exception route", { required: true, multiline: true })}${input(`${base}.metric`, "Success metric", { required: true })}${input(`${base}.readiness`, "Readiness assessment", { required: true })}${input(`${base}.risk`, "Primary risk", { required: true, multiline: true })}</div></section>`;
+  const removeLabel =
+    state.language === "en"
+      ? `Remove bottleneck ${index + 1}`
+      : `删除瓶颈 ${index + 1}`;
+  const candidateTitle =
+    state.language === "en"
+      ? index === 0
+        ? "Primary AI workflow candidate"
+        : "Additional AI workflow candidate"
+      : index === 0
+        ? "首要 AI 工作流程候选"
+        : "额外 AI 工作流程候选";
+  const candidateNote =
+    state.language === "en"
+      ? index === 0
+        ? "Required - begin with the most important bottleneck"
+        : "Optional - include only if this is a distinct bottleneck"
+      : index === 0
+        ? "必填——从最重要的瓶颈开始"
+        : "选填——仅添加不同且重要的瓶颈";
+  return `<section class="workflow-candidate-form"><header><span>0${index + 1}</span><div><b>${candidateTitle}</b><small>${candidateNote}</small></div>${index > 0 ? `<button type="button" class="ghost remove-candidate" data-remove-bottleneck="${index}" aria-label="${removeLabel}">${state.language === "en" ? "Remove" : "删除"}</button>` : ""}</header><div class="two-col">${input(`${base}.issue`, "Business problem", { required: true })}${input(`${base}.impact`, "Business impact", { required: true })}${input(`${base}.trigger`, "Workflow trigger", { required: true })}${input(`${base}.inputs`, "Required inputs / data", { required: true, multiline: true })}${input(`${base}.aiTask`, "Proposed AI task", { required: true, multiline: true })}${input(`${base}.humanApproval`, "Human approval point", { required: true, multiline: true })}${input(`${base}.owner`, "Accountable owner", { required: true })}${input(`${base}.exceptions`, "Exception route", { required: true, multiline: true })}${input(`${base}.metric`, "Success metric", { required: true })}${input(`${base}.readiness`, "Readiness assessment", { required: true })}${input(`${base}.risk`, "Primary risk", { required: true, multiline: true })}</div></section>`;
 }
 
 function diagnosticScreen() {
@@ -537,7 +577,12 @@ function diagnosticScreen() {
     state.language === "en"
       ? "Use the descriptions below before choosing. A higher score always means the capability is more established, repeatable and less dependent on individuals."
       : "请先阅读每项说明再评分。分数越高，代表该能力越成熟、越能重复执行，也越不依赖个人。";
-  return `<section class="page-shell">${screenHeader("02", tr("diagTitle"), tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item, index) => ratingRow(item, `diagnostic.stageRatings.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map((key) => ratingRow(guide.os[state.language][key], `diagnostic.osRatings.${key}`)).join("")}</fieldset><fieldset><legend>C · ${state.language === "en" ? "Top three business bottlenecks and AI workflow candidates" : "三大业务瓶颈与 AI 工作流程候选"}</legend><p class="help">${state.language === "en" ? "Complete every governance field. These are proposed workflows only; implementation requires a separate readiness and risk decision." : "请完成每个治理字段。这些只是建议流程；实施前仍需另行确认准备度与风险。"}</p>${state.diagnostic.bottlenecks.map(workflowCandidateForm).join("")}</fieldset>${formFooter("plan")}</form></section>`;
+  const canAddBottleneck = state.diagnostic.bottlenecks.length < 3;
+  const remainingSlots = 3 - state.diagnostic.bottlenecks.length;
+  const addButton = canAddBottleneck
+    ? `<button type="button" class="add-candidate" data-add-bottleneck><span>＋</span>${state.language === "en" ? "Add another bottleneck (optional)" : "添加另一个瓶颈（选填）"}<small>${state.language === "en" ? `${remainingSlots} additional slot${remainingSlots === 1 ? "" : "s"} available` : `还可添加 ${remainingSlots} 项`}</small></button>`
+    : `<p class="candidate-limit">${state.language === "en" ? "Maximum of three bottlenecks reached." : "已达到最多三个瓶颈。"}</p>`;
+  return `<section class="page-shell">${screenHeader("02", tr("diagTitle"), tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item, index) => ratingRow(item, `diagnostic.stageRatings.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map((key) => ratingRow(guide.os[state.language][key], `diagnostic.osRatings.${key}`)).join("")}</fieldset><fieldset><legend>C · ${state.language === "en" ? "Business bottlenecks and AI workflow candidates (up to 3)" : "业务瓶颈与 AI 工作流程候选（最多 3 项）"}</legend><p class="help">${state.language === "en" ? "Start with the single most important bottleneck. Add a second or third only when each is distinct and useful. Every added candidate must be completed before continuing." : "先填写一个最重要的瓶颈。只有在其他瓶颈明确且有价值时，才添加第二或第三项。每个已添加的候选都必须填写完整后才能继续。"}</p>${state.diagnostic.bottlenecks.map(workflowCandidateForm).join("")}${addButton}</fieldset>${formFooter("plan")}</form></section>`;
 }
 
 function hypothesisForm(item, index) {
@@ -729,19 +774,6 @@ async function downloadAllReportPdfs(button) {
   }
 }
 function validate(step) {
-  const workflowFields = [
-    "issue",
-    "impact",
-    "trigger",
-    "inputs",
-    "aiTask",
-    "humanApproval",
-    "owner",
-    "exceptions",
-    "metric",
-    "readiness",
-    "risk",
-  ];
   const hypothesisFields = [
     "opportunity",
     "assumption",
@@ -811,6 +843,36 @@ app.addEventListener("change", (event) => {
     render();
 });
 app.addEventListener("click", (event) => {
+  if (event.target.closest("[data-add-bottleneck]")) {
+    if (state.diagnostic.bottlenecks.length < 3) {
+      state.diagnostic.bottlenecks.push(blankWorkflowCandidate());
+      persist();
+      render();
+      requestAnimationFrame(() => {
+        app
+          .querySelectorAll(".workflow-candidate-form")
+          .item(state.diagnostic.bottlenecks.length - 1)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    return;
+  }
+  const removeBottleneck = event.target.closest("[data-remove-bottleneck]");
+  if (removeBottleneck && state.diagnostic.bottlenecks.length > 1) {
+    const index = Number(removeBottleneck.dataset.removeBottleneck);
+    const label = state.diagnostic.bottlenecks[index]?.issue || `0${index + 1}`;
+    const confirmed = window.confirm(
+      state.language === "en"
+        ? `Remove this optional bottleneck?\n\n${label}`
+        : `确定删除这个选填瓶颈吗？\n\n${label}`,
+    );
+    if (confirmed) {
+      state.diagnostic.bottlenecks.splice(index, 1);
+      persist();
+      render();
+    }
+    return;
+  }
   const downloadAllButton = event.target.closest("[data-download-all]");
   if (downloadAllButton) {
     downloadAllReportPdfs(downloadAllButton);
