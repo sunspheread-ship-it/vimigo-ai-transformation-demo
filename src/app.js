@@ -7,6 +7,7 @@ import { initialState, osKeys } from "./sample-data.js";
 import { buildDetailedReports } from "./reports.js";
 
 const STORAGE_KEY = "vimigo-transformation-demo-v2";
+let pdfDownloadInProgress = false;
 const workflowFields = [
   "issue",
   "impact",
@@ -739,6 +740,15 @@ function safeFileName(value, fallback = "Vimigo report") {
 
 async function downloadReportPdf(reportNumber, button) {
   const status = app.querySelector("[data-download-status]");
+  if (pdfDownloadInProgress) {
+    if (status) {
+      status.textContent = state.language === "en"
+        ? "Please wait for the current PDF to finish."
+        : "请等待当前 PDF 完成后再下载下一份。";
+    }
+    return;
+  }
+  pdfDownloadInProgress = true;
   const originalMarkup = button.innerHTML;
   let stage;
 
@@ -756,10 +766,8 @@ async function downloadReportPdf(reportNumber, button) {
       throw new Error(`Report ${reportNumber} was not found.`);
     }
 
-    const matchingButtons = [
-      ...app.querySelectorAll(`[data-download-report="${reportNumber}"]`),
-    ];
-    matchingButtons.forEach((item) => {
+    const downloadButtons = [...app.querySelectorAll("[data-download-report]")];
+    downloadButtons.forEach((item) => {
       item.disabled = true;
     });
     const company = safeFileName(state.pre.company, "Client company");
@@ -768,8 +776,14 @@ async function downloadReportPdf(reportNumber, button) {
       `Report ${reportNumber}`,
     );
 
-    button.textContent = `Creating PDF ${reportNumber}...`;
-    setStatus(`Preparing ${reportNumber} - ${title}`);
+    button.textContent = state.language === "en"
+      ? `Creating PDF ${reportNumber}...`
+      : `正在建立 PDF ${reportNumber}...`;
+    setStatus(
+      state.language === "en"
+        ? `Preparing ${reportNumber} - ${title}`
+        : `正在准备 ${reportNumber} - ${title}`,
+    );
 
     stage = document.createElement("div");
     stage.className = "pdf-export-stage";
@@ -797,10 +811,29 @@ async function downloadReportPdf(reportNumber, button) {
           avoid: [
             ".report-head",
             ".report-meta",
+            ".source-legend",
+            ".score-hero",
+            ".breakdown",
+            ".finding-grid",
             ".finding-grid > div",
+            ".report-section-head",
             ".priority-list section",
+            ".mechanism-chain",
+            ".three-cards",
+            ".three-cards section",
             ".workflow-detail",
+            ".workflow-assessment",
+            ".workflow-assessment > div",
+            ".dependency-grid > div",
+            ".requirement-list li",
+            ".timeline",
+            ".timeline section",
+            ".target-card",
+            ".primary-route",
+            ".financial",
             ".decision-box",
+            ".report-footer",
+            "thead",
             "tr",
           ],
         },
@@ -816,17 +849,20 @@ async function downloadReportPdf(reportNumber, button) {
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-    setStatus(`Complete: Report ${reportNumber} downloaded as a PDF.`);
+    setStatus(
+      state.language === "en"
+        ? `Complete: Report ${reportNumber} downloaded as a PDF.`
+        : `完成：报告 ${reportNumber} 已下载为 PDF。`,
+    );
   } catch (error) {
     console.error(error);
     setStatus(`Download failed: ${error.message}`);
   } finally {
     if (stage) stage.remove();
-    app
-      .querySelectorAll(`[data-download-report="${reportNumber}"]`)
-      .forEach((item) => {
-        item.disabled = false;
-      });
+    pdfDownloadInProgress = false;
+    app.querySelectorAll("[data-download-report]").forEach((item) => {
+      item.disabled = false;
+    });
     button.innerHTML = originalMarkup;
   }
 }

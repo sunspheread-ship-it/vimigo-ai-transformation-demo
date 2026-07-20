@@ -74,12 +74,192 @@ const osImpact = {
 };
 
 const r = (language, en, zh) => (language === "zh" ? zh : en);
+let reportLanguage = "en";
+const reportTitles = {
+  "01": { en: "AI Transformation Score Report", zh: "AI 企业转型评分报告" },
+  "02": { en: "Current Transformation Stage Report", zh: "企业当前转型阶段报告" },
+  "03": { en: "Six OS Gap Radar Report", zh: "六大 OS 差距雷达报告" },
+  "04": { en: "Top Three AI Workflow Priority Report", zh: "三大 AI 工作流程优先报告" },
+  "05": { en: "90-Day AI Performance Transformation Master Plan", zh: "90 天 AI 绩效转型行动总计划" },
+  "06": { en: "Business Model & Vimigo Product-Matching Report", zh: "商业模式与 Vimigo 产品匹配报告" },
+};
+const zhReportText = {
+  "Maturity assessment": "转型成熟度评估",
+  "Six OS average": "六大 OS 平均分",
+  "Dimension": "评估维度",
+  "Score": "评分",
+  "Current interpretation": "当前情况解读",
+  "Operating system": "营运系统",
+  "Management question": "管理层关键问题",
+  "Likely business impact": "可能造成的业务影响",
+  "Methodology": "评分方法",
+  "Overall score = 40% maturity assessment + 60% Six OS average. Each 1-5 rating converts to 20-100.": "总评分 = 40% 转型成熟度评估 + 60% 六大 OS 平均分。每个 1-5 分评分会转换为 20-100 分。",
+  "CSM must confirm before release": "发布前必须由 CSM 确认",
+  "The selected ratings match the workshop discussion.": "所选评分与工作坊讨论结果一致。",
+  "Baseline and target definitions are comparable.": "当前基线与目标采用可比较的定义。",
+  "The three constraints reflect management priorities.": "三大限制确实反映管理层优先事项。",
+  "Projected outcomes are labelled as hypotheses.": "所有预测结果均清楚标示为待验证假设。",
+  "The business slows or stops without the owner.": "企业在老板不介入时就会变慢或停摆。",
+  "Some SOPs exist, but adoption and ownership are inconsistent.": "部分 SOP 已存在，但执行采用和责任归属仍不一致。",
+  "KPIs, actions, ownership and rewards are disconnected.": "KPI、行动、责任人与奖励之间尚未连接。",
+  "Data is late, incomplete or disputed.": "管理资料延迟、不完整或存在争议。",
+  "AI use is absent or ad hoc with no controls.": "AI 尚未使用，或仅零散使用且缺乏管控。",
+  "Unclear priorities spread management attention and make trade-offs inconsistent.": "优先事项不清会分散管理层注意力，并导致取舍标准不一致。",
+  "Weak execution linkage creates activity without dependable accountability or results.": "执行连接薄弱会产生大量活动，却没有可靠的责任归属或结果。",
+  "Teams may optimise activity without knowing its effect on revenue, margin, cash or cost.": "团队可能只优化活动，却不清楚对营收、利润、现金流或成本的影响。",
+  "Inconsistent recognition weakens trust and reduces reinforcement of the right behaviour.": "不一致的认可机制会削弱信任，也难以强化正确行为。",
+  "Unclear role fit and capability gaps increase owner intervention and execution variance.": "角色匹配不清与能力差距会增加老板介入和执行偏差。",
+  "Uncontrolled AI use creates quality, privacy, accountability and adoption risk.": "缺乏管控的 AI 使用会带来质量、隐私、责任及采用风险。",
+  "Document the critical repeatable processes.": "记录关键且可重复的流程。",
+  "Assign decision rights and accountable owners.": "明确决策权限与责任人。",
+  "Create a weekly review with visible exceptions.": "建立能看见例外情况的每周复盘。",
+  "Connect goals to weekly key actions and named owners.": "把目标连接到每周关键行动和明确责任人。",
+  "Define result metrics, baselines and corrective-action rules.": "定义结果指标、基线和纠偏规则。",
+  "Connect fair recognition or rewards to verified results.": "把公平的认可或奖励连接到经验证结果。",
+  "Standardise data definitions and reporting cut-offs.": "统一资料定义与汇报截止时间。",
+  "Create timely exception visibility for management.": "让管理层及时看见例外情况。",
+  "Use data consistently for review, correction and resource decisions.": "持续使用资料进行复盘、纠偏和资源决策。",
+  "Select narrow, repeatable workflows with reliable data.": "选择范围明确、可重复且资料可靠的工作流程。",
+  "Define AI tasks, human approval, exceptions and audit evidence.": "定义 AI 任务、人工批准、例外处理和审计依据。",
+  "Pilot, measure and approve scaling only after risk validation.": "先试点和衡量，完成风险验证后才批准扩大。",
+  "Strengthen governance, auditability and exception learning.": "加强治理、可审计性及例外学习机制。",
+  "Review workflow value, risk and human accountability quarterly.": "每季度复盘工作流程价值、风险和人工责任。",
+  "Scale only the workflows that show verified operating benefit.": "只扩大已经验证营运效益的工作流程。",
+  "PRIORITY": "优先项",
+  "Action": "行动",
+  "Accountable owner": "责任人",
+  "Completion indicator": "完成指标",
+  "Review point": "复盘节点",
+  "Definitions, owners and source list approved": "定义、责任人与资料来源清单已获批准",
+  "Weekly review record using": "每周复盘记录采用",
+  "First operating result and exception log": "首个营运结果与例外记录",
+  "Day 1": "第 1 天",
+  "Day 30": "第 30 天",
+  "Day 60": "第 60 天",
+  "Day 90": "第 90 天",
+  "Weekly": "每周",
+  "Gap:": "差距：",
+  "90-day validation action:": "90 天验证行动：",
+  "Owner:": "负责人：",
+  "Metric:": "指标：",
+  "Direction → Performance": "方向 OS → 绩效 OS",
+  "Priorities must become owned weekly actions before the strategy can affect results.": "优先事项必须转化为有明确责任人的每周行动，战略才会影响结果。",
+  "Performance → Money": "绩效 OS → 金钱 OS",
+  "Actions must connect to commercial drivers before improvement can be quantified.": "行动必须连接商业驱动因素，改善成果才能量化。",
+  "Reward → Talent": "奖励 OS → 人才 OS",
+  "Fair reinforcement and role clarity are required to sustain the expected behaviour.": "公平的强化机制和清晰的角色责任，是持续形成预期行为的必要条件。",
+  "AI Execution → All OS": "AI 执行 OS → 所有 OS",
+  "AI should strengthen existing operating systems through governed workflows, not operate as a separate seventh system.": "AI 应通过受治理的工作流程强化现有营运系统，而不是成为独立的第七套系统。",
+  "Governance field": "治理项目",
+  "Structured draft": "结构化草稿",
+  "Business result": "业务结果",
+  "Trigger": "触发条件",
+  "Required inputs": "所需输入资料",
+  "Proposed AI task": "建议的 AI 任务",
+  "Human approval": "人工批准点",
+  "Exception route": "例外处理路径",
+  "Success metric": "成功指标",
+  "Readiness": "准备度",
+  "Primary risk": "主要风险",
+  "Expected operational benefit": "预期营运效益",
+  "NOT IMPLEMENTED": "尚未实施",
+  "Candidate only. Data access, privacy, approved rules, exception handling and test acceptance must be confirmed before implementation.": "仅属候选方案。实施前必须确认资料权限、隐私要求、批准规则、例外处理及测试验收标准。",
+  "Priority": "优先次序",
+  "Business problem": "业务问题",
+  "Implementation approval gate": "实施批准关卡",
+  "Confirm lawful and approved access to every required data source.": "确认所有所需资料来源均具备合法且已批准的访问权限。",
+  "Approve response rules, human decisions and exception routes.": "批准回复规则、人工决策点及例外处理路径。",
+  "Define a test set, baseline, target and rollback procedure.": "定义测试样本、基线、目标及回退程序。",
+  "Name an accountable business owner; technology does not own the result.": "指定业务责任人；技术本身不承担业务结果。",
+  "Record audit evidence and review the result before scaling.": "保存审计记录，并在扩大使用前复盘结果。",
+  "Level": "层级",
+  "Approved statement": "已确认内容",
+  "Owner / source": "负责人／资料来源",
+  "12-month direction": "12 个月方向",
+  "90-day must-win result": "90 天必须达成的结果",
+  "Current baseline": "当前基线",
+  "90-day target": "90 天目标",
+  "Reward / recognition": "奖励／认可",
+  "90-DAY MUST-WIN RESULT": "90 天必须达成的结果",
+  "Fixed weekly key action:": "固定每周关键行动：",
+  "Period": "期间",
+  "Management purpose": "管理目的",
+  "Key action": "关键行动",
+  "Evidence / metric": "依据／指标",
+  "Weeks 1-4": "第 1-4 周",
+  "Weeks 5-8": "第 5-8 周",
+  "Weeks 9-12": "第 9-12 周",
+  "Week 13": "第 13 周",
+  "Align and launch": "对齐并启动",
+  "Stabilise execution": "稳定执行",
+  "Optimise and correct": "优化并纠偏",
+  "Validate and decide": "验证并决策",
+  "Approved definitions, owners and baseline": "已批准的定义、责任人与基线",
+  "Exception trend and corrective-action log": "例外趋势与纠偏行动记录",
+  "Verified result and scale/stop decision": "经验证结果及扩大／停止决定",
+  "Priority OS": "优先 OS",
+  "Current score": "当前评分",
+  "90-day focus": "90 天重点",
+  "Measure": "衡量指标",
+  "Owner": "负责人",
+  "Metric": "指标",
+  "Confirm the result metric and data cut-off.": "确认结果指标及资料截止时间。",
+  "Review completed and missed key actions by owner.": "按责任人复盘已完成及未完成的关键行动。",
+  "Review workflow exceptions, risks and customer-impact cases.": "复盘工作流程例外、风险及影响客户的个案。",
+  "Decide one corrective action with an owner and due date.": "决定一项纠偏行动，并指定责任人和完成日期。",
+  "Recognise verified behaviour or results using the agreed rule.": "根据已同意规则认可经验证的行为或结果。",
+  "Record decisions and carry unresolved items into the next review.": "记录决定，并将未解决事项带入下一次复盘。",
+  "Day 90 decision": "第 90 天决策",
+  "Management decides whether to stop, continue as DIY, activate a narrow Vimigo workspace, or approve deeper implementation. No expansion is automatic.": "管理层决定停止、继续自行执行、启用小范围 Vimigo 工作空间，或批准更深入实施。任何扩大执行都不是自动进行。",
+  "ONE PRIMARY NEXT MOVE": "一个主要下一步",
+  "Why this route fits:": "为什么适合：",
+  "Expected operating result:": "预期营运结果：",
+  "Review date:": "复盘日期：",
+  "This is a recommendation for management validation, not proof that the product has been activated or implemented.": "这是供管理层验证的建议，并不代表该产品已经启用或实施。",
+  "Opportunity": "改善机会",
+  "Assumption": "待验证假设",
+  "Expected upside": "预期效益",
+  "Validation action": "验证行动",
+  "Indicative monthly revenue opportunity:": "估算每月营收机会：",
+  "Formula: monthly volume × (target conversion - current conversion) × average transaction value. This is a scenario based on client-supplied data, not a guaranteed gain.": "公式：每月数量 ×（目标转化率 - 当前转化率）× 平均交易价值。这是根据客户提供资料计算的情境，不是保证收益。",
+  "Optional later route": "后续可选路径",
+  "Decision trigger - not an immediate recommendation": "决策触发条件 - 并非立即建议",
+  "Only after activation is commercially confirmed; test one goal, three actions, one result and one reward for 30 days.": "仅在商业启用获得确认后进行；用 30 天测试一个目标、三项行动、一个结果和一个奖励。",
+  "Consider later if the primary constraint remains leadership direction and management-system discipline.": "若主要限制仍是领导方向与管理系统纪律，可在后续考虑。",
+  "Consider later if the company needs sustained review, coordination and transformation ownership.": "若公司需要持续复盘、协调及转型负责人，可在后续考虑。",
+  "Consider later only when a governed AI workflow is approved for design and implementation.": "仅在受治理的 AI 工作流程获批设计及实施后，才于后续考虑。",
+  "Management decision required": "需要管理层决策",
+  "Approve or reject the primary route.": "批准或否决主要建议路径。",
+  "Confirm commercial scope, activation status and responsible owner.": "确认商业范围、启用状态及责任人。",
+  "Approve the 30-day or 90-day validation metric.": "批准 30 天或 90 天验证指标。",
+  "Keep all later products outside the immediate recommendation until a verified need exists.": "在需求获得验证前，不把其他后续产品列入即时建议。",
+};
+
+function localizeReportHtml(html, language) {
+  if (language !== "zh") return html;
+  return Object.entries(zhReportText)
+    .sort(([left], [right]) => right.length - left.length)
+    .reduce(
+    (output, [english, chinese]) => output.split(english).join(chinese),
+    html,
+  );
+}
 const score100 = (rating) => Number(rating || 0) * 20;
 const pending = (language) =>
   r(language, "Requires CSM validation", "需要 CSM 验证");
 
 function reportHeader(number, title, subtitle) {
-  return `<header class="report-head"><span>${number}</span><div><small>CONFIDENTIAL · GENERATED FROM THIS CASE · CSM APPROVAL REQUIRED</small><h2>${title}</h2><p>${esc(subtitle)}</p></div><button class="ghost" data-download-report="${number}">Download PDF</button></header>`;
+  const language = reportLanguage;
+  const localizedTitle = reportTitles[number]?.[language] || title;
+  let localizedSubtitle = subtitle;
+  if (language === "zh" && number === "04") {
+    const count = String(subtitle).match(/^\d+/)?.[0] || "1";
+    localizedSubtitle = `已记录 ${count} 个候选工作流程 · 必须审核准备度与风险`;
+  }
+  if (language === "zh" && number === "06") {
+    localizedSubtitle = String(subtitle).replace(/^Primary route:/, "主要建议路径：");
+  }
+  return `<header class="report-head"><span>${number}</span><div><small>${r(language, "CONFIDENTIAL · GENERATED FROM THIS CASE · CSM APPROVAL REQUIRED", "机密 · 根据本案例生成 · 必须经过 CSM 批准")}</small><h2>${localizedTitle}</h2><p>${esc(localizedSubtitle)}</p></div></header>`;
 }
 
 function reportMeta(state, language) {
@@ -106,7 +286,7 @@ function table(headers, rows, className = "") {
 }
 
 function reportFooter(number, state, language) {
-  return `<footer class="report-footer"><span>Vimigo AI Transformation Day · Report ${number} of 6</span><span>${esc(state.pre.company)} · Version 0.1</span><span>${r(language, "Confidential · Release only after CSM approval", "机密 · 仅限 CSM 批准后发布")}</span></footer>`;
+  return `<footer class="report-footer"><span>${r(language, `Vimigo AI Transformation Day · Report ${number} of 6`, `Vimigo AI 企业转型日 · 第 ${number} 份，共 6 份`)}</span><span>${esc(state.pre.company)} · ${r(language, "Version", "版本")} 0.1</span><span>${r(language, "Confidential · Release only after CSM approval", "机密 · 仅限 CSM 批准后发布")}</span></footer>`;
 }
 
 function mechanismChain(state, language) {
@@ -364,6 +544,7 @@ function productReport(ctx) {
 
 export function buildDetailedReports(ctx) {
   const language = ctx.state.language;
+  reportLanguage = language;
   const t = {
     facts: ctx.t("facts"),
     assessment: ctx.t("assessment"),
@@ -377,7 +558,7 @@ export function buildDetailedReports(ctx) {
     workflowReport(full),
     masterPlanReport(full),
     productReport(full),
-  ];
+  ].map((report) => localizeReportHtml(report, language));
   const intro = r(
     language,
     "Six personalised consulting drafts generated from the form answers in this case. Final PDFs are exported only after CSM review and approval.",

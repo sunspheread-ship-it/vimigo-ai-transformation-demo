@@ -83,6 +83,45 @@ test("report pack offers six direct PDF download buttons without ZIP or print", 
   assert.doesNotMatch(appSource, /window\.print\(\)|window\.JSZip/);
 });
 
+test("PDF generation is globally queued and protects page-break content", () => {
+  assert.match(appSource, /let pdfDownloadInProgress = false/);
+  assert.match(appSource, /if \(pdfDownloadInProgress\)/);
+  assert.match(appSource, /querySelectorAll\("\[data-download-report\]"\)/);
+  for (const selector of [".report-section-head", ".mechanism-chain", ".requirement-list li", "thead", "tr"]) {
+    assert.ok(appSource.includes(`"${selector}"`));
+  }
+  assert.match(stylesSource, /\.pdf-export-report tr\s*\{[^}]*break-inside:\s*avoid/s);
+});
+
+test("report page exposes only the six primary PDF download controls", () => {
+  const headerFunction = reportsSource.slice(
+    reportsSource.indexOf("function reportHeader"),
+    reportsSource.indexOf("function reportMeta"),
+  );
+  assert.doesNotMatch(headerFunction, /data-download-report/);
+  assert.equal((reportsSource.match(/data-download-report=/g) || []).length, 1);
+});
+
+test("Chinese PDF templates localise titles, tables and approval language", () => {
+  for (const text of [
+    "AI 企业转型评分报告",
+    "企业当前转型阶段报告",
+    "评估维度",
+    "当前情况解读",
+    "发布前必须由 CSM 确认",
+    "实施批准关卡",
+    "管理层决策",
+  ]) {
+    assert.match(reportsSource, new RegExp(text));
+  }
+  assert.match(reportsSource, /localizeReportHtml/);
+});
+
+test("mobile keeps clear and sample controls accessible", () => {
+  assert.match(stylesSource, /\.top-actions\s*\{[^}]*grid-template-columns:\s*auto minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
+  assert.match(stylesSource, /\.top-actions > \.ghost\s*\{[^}]*display:\s*block/s);
+});
+
 test("direct PDF clone carries its own print-style formatting class", () => {
   assert.match(appSource, /clone\.classList\.add\("pdf-export-report"\)/);
   assert.match(stylesSource, /\.pdf-export-report\.report-sheet/);
