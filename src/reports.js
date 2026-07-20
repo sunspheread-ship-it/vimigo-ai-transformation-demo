@@ -249,27 +249,39 @@ function addReportPageBreaks(html, reportNumber) {
   const breakBefore = {
     "01": [
       "Executive interpretation",
+      "执行摘要",
       "Six OS component detail",
+      "六大 OS 评分明细",
       "How Vimigo is expected to increase performance",
+      "Vimigo 如何提升绩效",
     ],
     "02": [
       "Three blockers holding back the next stage",
+      "阻碍进入下一阶段的三大因素",
       "30-day stage-readiness actions",
+      "30 天阶段准备行动",
     ],
     "03": [
       "Six OS assessment detail",
+      "六大 OS 评估明细",
       "First three OS areas requiring attention",
+      "优先改善的三大 OS",
     ],
     "04": ['<section class="workflow-detail">'],
     "05": [
       '<div class="target-card">',
       "13-week operating rhythm",
+      "13 周执行节奏",
       "Weekly management review agenda",
+      "每周管理复盘议程",
     ],
     "06": [
       "How the recommended route is expected to improve performance",
+      "建议路径如何提升绩效",
       "Maximum three business-model improvement opportunities",
+      "最多三项商业模式改善机会",
       "Scope boundary and optional later stages",
+      "范围边界与后续可选阶段",
     ],
   };
   return (breakBefore[reportNumber] || []).reduce((output, marker) => {

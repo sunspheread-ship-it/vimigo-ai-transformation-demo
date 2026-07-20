@@ -4,7 +4,7 @@ import {
   getStage,
 } from "./scoring.js";
 import { initialState, osKeys } from "./sample-data.js";
-import { buildDetailedReports } from "./reports.js?v=20260720-2";
+import { buildDetailedReports } from "./reports.js?v=20260720-3";
 
 const STORAGE_KEY = "vimigo-transformation-demo-v2";
 let pdfDownloadInProgress = false;
