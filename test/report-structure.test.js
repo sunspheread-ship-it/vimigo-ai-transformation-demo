@@ -83,3 +83,12 @@ test("workflow candidates use one required entry with optional expansion to thre
   assert.match(appSource, /Start with the single most important bottleneck/);
   assert.match(reportsSource, /candidateCount = state\.diagnostic\.bottlenecks\.length/);
 });
+
+test("header offers a confirmed clear-all action that creates blank client data", () => {
+  assert.match(appSource, /data-clear/);
+  assert.match(appSource, /Clear all data/);
+  assert.match(appSource, /createEmptyState\(state\.language\)/);
+  assert.match(appSource, /stageRatings = empty\.diagnostic\.stageRatings\.map\(\(\) => null\)/);
+  assert.match(appSource, /empty\.diagnostic\.bottlenecks = \[blankWorkflowCandidate\(\)\]/);
+  assert.match(appSource, /This cannot be undone/);
+});

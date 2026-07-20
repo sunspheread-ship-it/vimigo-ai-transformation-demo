@@ -126,6 +126,15 @@ button {
   background: #0b192b;
   color: var(--text);
 }
+.clear-data {
+  color: #ff9eaa;
+  border-color: #693545;
+}
+.clear-data:hover,
+.clear-data:focus-visible {
+  background: #311727;
+  border-color: var(--coral);
+}
 .primary {
   border: 0;
   background: linear-gradient(120deg, var(--cyan), var(--blue));

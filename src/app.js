@@ -92,6 +92,7 @@ const copy = {
     submit: "Save demo review pack",
     confirmed: "Saved on this device only - the CSM was not notified",
     reset: "Reload sample",
+    clear: "Clear all data",
     print: "Print / Save this PDF",
     facts: "Verified client facts",
     assessment: "CSM assessment",
@@ -162,6 +163,7 @@ const copy = {
     submit: "保存示范审核资料",
     confirmed: "仅保存在此装置 - CSM 尚未收到通知",
     reset: "重新载入示范",
+    clear: "清空所有资料",
     print: "打印／储存此报告",
     facts: "已核实的客户事实",
     assessment: "CSM 评估",
@@ -412,6 +414,34 @@ const app = document.querySelector("#app");
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
+
+function createEmptyState(language = "en") {
+  const empty = clone(initialState);
+  empty.language = language;
+  empty.activeStep = "pre";
+  empty.submitted = false;
+
+  Object.keys(empty.pre).forEach((key) => {
+    empty.pre[key] = typeof empty.pre[key] === "boolean" ? false : "";
+  });
+
+  empty.diagnostic.stageRatings = empty.diagnostic.stageRatings.map(() => null);
+  empty.diagnostic.osRatings = Object.fromEntries(
+    osKeys.map((key) => [key, null]),
+  );
+  empty.diagnostic.bottlenecks = [blankWorkflowCandidate()];
+
+  Object.keys(empty.plan).forEach((key) => {
+    if (key === "hypotheses") {
+      empty.plan.hypotheses = empty.plan.hypotheses.map((item) =>
+        Object.fromEntries(Object.keys(item).map((field) => [field, ""])),
+      );
+    } else {
+      empty.plan[key] = typeof empty.plan[key] === "boolean" ? false : "";
+    }
+  });
+  return empty;
+}
 function esc(value) {
   return String(value ?? "").replace(
     /[&<>'"]/g,
@@ -473,18 +503,31 @@ function setPath(path, value) {
   persist();
 }
 function metrics() {
-  const score = calculateScore(
-    state.diagnostic.stageRatings,
-    state.diagnostic.osRatings,
+  const ratings = [
+    ...state.diagnostic.stageRatings,
+    ...Object.values(state.diagnostic.osRatings),
+  ];
+  const assessed = ratings.every(
+    (value) => Number(value) >= 1 && Number(value) <= 5,
   );
-  return { score, stageKey: getStage(score.overall) };
+  const score = assessed
+    ? calculateScore(
+        state.diagnostic.stageRatings,
+        state.diagnostic.osRatings,
+      )
+    : { maturity: 0, os: 0, overall: 0 };
+  return {
+    score,
+    stageKey: assessed ? getStage(score.overall) : "boss",
+    assessed,
+  };
 }
 
 function brand() {
   return `<img src="https://vimigo.io/wp-content/uploads/2025/10/Logo.png" alt="Vimigo" width="257" height="58">`;
 }
 function header() {
-  return `<header class="topbar"><a class="brand" href="#" data-step="journey">${brand()}<span>AI Transformation Day</span></a><div class="top-actions"><span class="demo-badge">${tr("demo")}</span><div class="lang-switch" aria-label="Language"><button data-lang="en" class="${state.language === "en" ? "active" : ""}">EN</button><button data-lang="zh" class="${state.language === "zh" ? "active" : ""}">中文</button></div><button class="ghost" data-reset>${tr("reset")}</button></div></header>`;
+  return `<header class="topbar"><a class="brand" href="#" data-step="journey">${brand()}<span>AI Transformation Day</span></a><div class="top-actions"><span class="demo-badge">${tr("demo")}</span><div class="lang-switch" aria-label="Language"><button data-lang="en" class="${state.language === "en" ? "active" : ""}">EN</button><button data-lang="zh" class="${state.language === "zh" ? "active" : ""}">中文</button></div><button class="ghost clear-data" data-clear>${tr("clear")}</button><button class="ghost" data-reset>${tr("reset")}</button></div></header>`;
 }
 function nav() {
   const items = [
@@ -512,8 +555,13 @@ function screenHeader(number, title, intro) {
 }
 
 function journeyScreen() {
-  const { score, stageKey } = metrics();
-  return `<section class="hero"><div><p class="eyebrow">FROM DIAGNOSIS TO EXECUTION</p><h1>${tr("title")}</h1><p>${tr("subtitle")}</p><button class="primary" data-step="pre">${tr("start")} →</button></div><div class="score-orbit"><div><small>${tr("score")}</small><strong>${score.overall}</strong><span>/100</span><b>${labels.stageNames[state.language][stageKey]}</b></div></div></section>
+  const { score, stageKey, assessed } = metrics();
+  const stageName = assessed
+    ? labels.stageNames[state.language][stageKey]
+    : state.language === "en"
+      ? "Not assessed"
+      : "尚未评估";
+  return `<section class="hero"><div><p class="eyebrow">FROM DIAGNOSIS TO EXECUTION</p><h1>${tr("title")}</h1><p>${tr("subtitle")}</p><button class="primary" data-step="pre">${tr("start")} →</button></div><div class="score-orbit"><div><small>${tr("score")}</small><strong>${assessed ? score.overall : "—"}</strong><span>${assessed ? "/100" : ""}</span><b>${stageName}</b></div></div></section>
   <section class="journey-grid">${[
     ["01", tr("client"), tr("pre")],
     ["02", tr("together"), tr("diagnostic")],
@@ -571,8 +619,13 @@ function workflowCandidateForm(item, index) {
 }
 
 function diagnosticScreen() {
-  const { score, stageKey } = metrics();
+  const { score, stageKey, assessed } = metrics();
   const guide = assessmentGuidance;
+  const stageName = assessed
+    ? labels.stageNames[state.language][stageKey]
+    : state.language === "en"
+      ? "Not assessed"
+      : "尚未评估";
   const scoringIntro =
     state.language === "en"
       ? "Use the descriptions below before choosing. A higher score always means the capability is more established, repeatable and less dependent on individuals."
@@ -582,7 +635,7 @@ function diagnosticScreen() {
   const addButton = canAddBottleneck
     ? `<button type="button" class="add-candidate" data-add-bottleneck><span>＋</span>${state.language === "en" ? "Add another bottleneck (optional)" : "添加另一个瓶颈（选填）"}<small>${state.language === "en" ? `${remainingSlots} additional slot${remainingSlots === 1 ? "" : "s"} available` : `还可添加 ${remainingSlots} 项`}</small></button>`
     : `<p class="candidate-limit">${state.language === "en" ? "Maximum of three bottlenecks reached." : "已达到最多三个瓶颈。"}</p>`;
-  return `<section class="page-shell">${screenHeader("02", tr("diagTitle"), tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${score.overall}/100</strong></div><div><span>${tr("stage")}</span><strong>${labels.stageNames[state.language][stageKey]}</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item, index) => ratingRow(item, `diagnostic.stageRatings.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map((key) => ratingRow(guide.os[state.language][key], `diagnostic.osRatings.${key}`)).join("")}</fieldset><fieldset><legend>C · ${state.language === "en" ? "Business bottlenecks and AI workflow candidates (up to 3)" : "业务瓶颈与 AI 工作流程候选（最多 3 项）"}</legend><p class="help">${state.language === "en" ? "Start with the single most important bottleneck. Add a second or third only when each is distinct and useful. Every added candidate must be completed before continuing." : "先填写一个最重要的瓶颈。只有在其他瓶颈明确且有价值时，才添加第二或第三项。每个已添加的候选都必须填写完整后才能继续。"}</p>${state.diagnostic.bottlenecks.map(workflowCandidateForm).join("")}${addButton}</fieldset>${formFooter("plan")}</form></section>`;
+  return `<section class="page-shell">${screenHeader("02", tr("diagTitle"), tr("diagIntro"))}<div class="diagnostic-summary"><div><span>${tr("score")}</span><strong>${assessed ? `${score.overall}/100` : "—"}</strong></div><div><span>${tr("stage")}</span><strong>${stageName}</strong></div></div><div class="assessment-intro"><b>${state.language === "en" ? "How to answer" : "评分方法"}</b><p>${scoringIntro}</p><span>1 = ${state.language === "en" ? "weak / absent" : "薄弱／没有"}</span><span>3 = ${state.language === "en" ? "partly established" : "部分建立"}</span><span>5 = ${state.language === "en" ? "embedded and consistent" : "成熟并稳定执行"}</span></div><form data-form="diagnostic"><fieldset><legend>A · ${tr("stageAssessment")}</legend>${guide.stages[state.language].map((item, index) => ratingRow(item, `diagnostic.stageRatings.${index}`)).join("")}</fieldset><fieldset><legend>B · ${tr("osAssessment")}</legend>${osKeys.map((key) => ratingRow(guide.os[state.language][key], `diagnostic.osRatings.${key}`)).join("")}</fieldset><fieldset><legend>C · ${state.language === "en" ? "Business bottlenecks and AI workflow candidates (up to 3)" : "业务瓶颈与 AI 工作流程候选（最多 3 项）"}</legend><p class="help">${state.language === "en" ? "Start with the single most important bottleneck. Add a second or third only when each is distinct and useful. Every added candidate must be completed before continuing." : "先填写一个最重要的瓶颈。只有在其他瓶颈明确且有价值时，才添加第二或第三项。每个已添加的候选都必须填写完整后才能继续。"}</p>${state.diagnostic.bottlenecks.map(workflowCandidateForm).join("")}${addButton}</fieldset>${formFooter("plan")}</form></section>`;
 }
 
 function hypothesisForm(item, index) {
@@ -598,7 +651,7 @@ function planScreen() {
     "Vimigo for AI Team",
     "Starter Workspace",
   ];
-  return `<section class="page-shell">${screenHeader("03", tr("planTitle"), tr("planIntro"))}<form data-form="plan"><fieldset><legend>A · 90-Day execution</legend>${input("plan.result", tr("result"), { required: true, multiline: true })}<div class="two-col">${input("plan.weeklyAction", tr("weeklyAction"), { required: true, multiline: true })}${input("plan.metric", tr("metric"), { required: true })}${input("plan.reward", tr("reward"), { required: true })}${input("plan.owner", tr("owner"), { required: true })}</div><div class="roadmap">${[1, 30, 60, 90].map((day) => input(`plan.day${day}`, `Day ${day}`, { required: true, multiline: true })).join("")}</div></fieldset><fieldset><legend>B · One primary next move</legend><label class="field"><span>${tr("product")} *</span><select data-path="plan.primaryProduct">${products.map((p) => `<option ${state.plan.primaryProduct === p ? "selected" : ""}>${p}</option>`).join("")}</select></label>${input("plan.productReason", tr("reason"), { required: true, multiline: true })}${input("plan.expectedResult", tr("expected"), { required: true, multiline: true })}<div class="two-col">${input("plan.reviewDate", tr("reviewDate"), { type: "date", required: true })}${input("plan.owner", tr("owner"), { required: true })}</div></fieldset><fieldset><legend>C · Business-model opportunities</legend><p class="help">Maximum three opportunities. Each must state the assumption, expected upside, validation action and metric.</p>${state.plan.hypotheses.slice(0, 3).map(hypothesisForm).join("")}</fieldset>${formFooter("reports", true)}</form></section>`;
+  return `<section class="page-shell">${screenHeader("03", tr("planTitle"), tr("planIntro"))}<form data-form="plan"><fieldset><legend>A · 90-Day execution</legend>${input("plan.result", tr("result"), { required: true, multiline: true })}<div class="two-col">${input("plan.weeklyAction", tr("weeklyAction"), { required: true, multiline: true })}${input("plan.metric", tr("metric"), { required: true })}${input("plan.reward", tr("reward"), { required: true })}${input("plan.owner", tr("owner"), { required: true })}</div><div class="roadmap">${[1, 30, 60, 90].map((day) => input(`plan.day${day}`, `Day ${day}`, { required: true, multiline: true })).join("")}</div></fieldset><fieldset><legend>B · One primary next move</legend><label class="field"><span>${tr("product")} *</span><select data-path="plan.primaryProduct" required><option value="" ${state.plan.primaryProduct ? "" : "selected"} disabled>${state.language === "en" ? "Select a primary route" : "请选择主要路径"}</option>${products.map((p) => `<option ${state.plan.primaryProduct === p ? "selected" : ""}>${p}</option>`).join("")}</select></label>${input("plan.productReason", tr("reason"), { required: true, multiline: true })}${input("plan.expectedResult", tr("expected"), { required: true, multiline: true })}<div class="two-col">${input("plan.reviewDate", tr("reviewDate"), { type: "date", required: true })}${input("plan.owner", tr("owner"), { required: true })}</div></fieldset><fieldset><legend>C · Business-model opportunities</legend><p class="help">Maximum three opportunities. Each must state the assumption, expected upside, validation action and metric.</p>${state.plan.hypotheses.slice(0, 3).map(hypothesisForm).join("")}</fieldset>${formFooter("reports", true)}</form></section>`;
 }
 
 function reportHeader(number, title, subtitle) {
@@ -640,12 +693,16 @@ function reportsScreen() {
 }
 
 function detailedReportsScreen() {
-  const { score, stageKey } = metrics();
+  const { score, stageKey, assessed } = metrics();
   return buildDetailedReports({
     state,
     score,
     stageKey,
-    stageName: labels.stageNames[state.language][stageKey],
+    stageName: assessed
+      ? labels.stageNames[state.language][stageKey]
+      : state.language === "en"
+        ? "Not assessed"
+        : "尚未评估",
     opportunity: estimateRevenueOpportunity(state.pre),
     guidance: assessmentGuidance,
     osKeys,
@@ -796,6 +853,8 @@ function validate(step) {
       state.pre.consent,
     ],
     diagnostic: [
+      ...state.diagnostic.stageRatings,
+      ...Object.values(state.diagnostic.osRatings),
       ...state.diagnostic.bottlenecks.flatMap((item) =>
         workflowFields.map((field) => item[field]),
       ),
@@ -883,6 +942,22 @@ app.addEventListener("click", (event) => {
     state.language = lang;
     persist();
     render();
+    return;
+  }
+  if (event.target.closest("[data-clear]")) {
+    const confirmed = window.confirm(
+      state.language === "en"
+        ? "Clear all saved answers and start a blank client form? This cannot be undone."
+        : "确定清空所有已保存资料并开始新的空白客户表格吗？此操作无法撤销。",
+    );
+    if (confirmed) {
+      localStorage.removeItem(STORAGE_KEY);
+      state = createEmptyState(state.language);
+      validationError = "";
+      persist();
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
     return;
   }
   if (event.target.closest("[data-reset]")) {
