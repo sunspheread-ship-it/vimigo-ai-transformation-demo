@@ -89,13 +89,11 @@ test("PDF generation is globally queued and protects page-break content", () => 
   assert.match(appSource, /querySelectorAll\("\[data-download-report\]"\)/);
   assert.match(reportsSource, /function addReportPageBreaks/);
   assert.match(reportsSource, /class="pdf-page-break"/);
-  assert.match(stylesSource, /\.pdf-export-report \.pdf-page-break\s*\{[^}]*display:\s*block/s);
-  assert.match(appSource, /async function renderCompletePdf/);
-  assert.match(appSource, /windowHeight:\s*captureHeight/);
+  assert.match(appSource, /function buildDesignedPdfPages/);
+  assert.match(appSource, /async function renderDesignedPdf/);
   assert.match(appSource, /function flattenPdfTables/);
-  assert.match(appSource, /context\.drawImage\(/);
   assert.match(appSource, /pdf\.deletePage\(/);
-  assert.match(appSource, /preferredBreaks/);
+  assert.match(stylesSource, /\.pdf-design-page\s*\{[^}]*width:\s*760px[^}]*height:\s*1075px/s);
   assert.match(appSource, /pagebreak:\s*\{\s*mode:\s*\[\]\s*\}/);
 });
 

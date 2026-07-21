@@ -1274,3 +1274,307 @@ form {
 .pdf-export-report .pdf-flat-head > div {
   color: #172033;
 }
+
+.pdf-design-stage {
+  top: calc(100vh + 40px);
+  width: 760px;
+  background: transparent;
+}
+.pdf-design-page {
+  width: 760px;
+  height: 1075px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 26px 18px;
+  overflow: hidden;
+  color: #f5f8ff;
+  background:
+    radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--pdf-accent) 16%, transparent), transparent 26%),
+    radial-gradient(circle at 8% 92%, rgba(28, 181, 232, 0.08), transparent 30%),
+    linear-gradient(145deg, #061426 0%, #020a16 58%, #061222 100%);
+  border: 1px solid #173450;
+  font-size: 11px;
+  line-height: 1.35;
+}
+.pdf-design-header {
+  flex: 0 0 34px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #183750;
+}
+.pdf-design-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pdf-design-brand img {
+  width: 105px;
+  height: auto;
+  display: block;
+}
+.pdf-design-brand span,
+.pdf-design-page-number span {
+  color: #7f9ab2;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.pdf-design-page-number strong {
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+}
+.pdf-design-title {
+  flex: 0 0 auto;
+  padding: 22px 0 16px;
+}
+.pdf-design-title > small {
+  color: var(--pdf-accent);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+.pdf-design-title h1 {
+  max-width: 650px;
+  margin: 7px 0 5px;
+  color: #fff;
+  font-size: 30px;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+.pdf-design-title > p {
+  margin: 0 0 13px;
+  color: var(--pdf-accent);
+  font-size: 14px;
+  font-weight: 800;
+}
+.pdf-design-title > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 14px;
+  border: 1px solid #1b4564;
+  border-radius: 9px;
+  background: rgba(5, 24, 42, 0.86);
+}
+.pdf-design-title > div b {
+  color: #fff;
+  font-size: 14px;
+}
+.pdf-design-title > div span {
+  color: #8eabc2;
+  font-size: 9px;
+}
+.pdf-design-section-label {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0 10px;
+  border-bottom: 1px solid #183750;
+}
+.pdf-design-section-label b {
+  color: var(--pdf-accent);
+  font-size: 14px;
+}
+.pdf-design-section-label span {
+  color: #7894ab;
+  font-size: 9px;
+}
+.pdf-design-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 6px;
+}
+.pdf-design-footer {
+  flex: 0 0 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 14px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #183750;
+  color: #6f8ba2;
+  font-size: 8px;
+}
+.pdf-design-footer span:nth-child(2) {
+  text-align: center;
+}
+.pdf-design-footer b {
+  color: var(--pdf-accent);
+}
+.pdf-design-page .report-meta,
+.pdf-design-page .finding-grid > div,
+.pdf-design-page .priority-list section,
+.pdf-design-page .mechanism-chain > div,
+.pdf-design-page .workflow-detail,
+.pdf-design-page .workflow-assessment > div,
+.pdf-design-page .dependency-grid > div,
+.pdf-design-page .requirement-list li,
+.pdf-design-page .decision-box,
+.pdf-design-page .breakdown p,
+.pdf-design-page .method,
+.pdf-design-page .mechanism,
+.pdf-design-page .stage-banner,
+.pdf-design-page .target-card,
+.pdf-design-page .primary-route,
+.pdf-design-page .financial,
+.pdf-design-page .three-cards section,
+.pdf-design-page .timeline section {
+  background: linear-gradient(145deg, rgba(8, 28, 49, 0.96), rgba(4, 17, 32, 0.96));
+  border-color: #1b4564;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.025);
+}
+.pdf-design-page .report-meta {
+  grid-template-columns: repeat(5, 1fr);
+  margin-bottom: 10px;
+  padding: 9px;
+}
+.pdf-design-page .report-meta b,
+.pdf-design-page .finding-grid b,
+.pdf-design-page .priority-list b,
+.pdf-design-page .workflow-detail h3,
+.pdf-design-page .decision-box b,
+.pdf-design-page .target-card b,
+.pdf-design-page .primary-route h3 {
+  color: #f5f8ff;
+}
+.pdf-design-page .report-meta span,
+.pdf-design-page .source-legend,
+.pdf-design-page .finding-grid p,
+.pdf-design-page .finding-grid em,
+.pdf-design-page .priority-list p,
+.pdf-design-page .workflow-detail p,
+.pdf-design-page .workflow-detail small,
+.pdf-design-page .method p,
+.pdf-design-page .mechanism p,
+.pdf-design-page .stage-banner p,
+.pdf-design-page .financial p,
+.pdf-design-page .timeline p,
+.pdf-design-page .primary-route p,
+.pdf-design-page .decision-box p,
+.pdf-design-page .decision-box li,
+.pdf-design-page li {
+  color: #9db1c4;
+}
+.pdf-design-page .source-legend {
+  margin-bottom: 10px;
+}
+.pdf-design-page .report-section-head {
+  margin: 14px 0 8px;
+  padding-bottom: 6px;
+  border-color: #1b4564;
+}
+.pdf-design-page .report-section-head h3 {
+  color: #fff;
+  font-size: 18px;
+}
+.pdf-design-page .report-section-head h3::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 17px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  border-radius: 3px;
+  background: var(--pdf-accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--pdf-accent) 55%, transparent);
+}
+.pdf-design-page .score-hero {
+  margin: 10px 0;
+}
+.pdf-design-page .score-hero strong {
+  color: #fff;
+  font-size: 70px;
+}
+.pdf-design-page .score-hero b,
+.pdf-design-page .score-hero > p,
+.pdf-design-page .stage-banner strong {
+  color: var(--pdf-accent);
+}
+.pdf-design-page .breakdown {
+  margin: 10px 0;
+}
+.pdf-design-page .breakdown p,
+.pdf-design-page .method,
+.pdf-design-page .mechanism,
+.pdf-design-page .stage-banner,
+.pdf-design-page .target-card,
+.pdf-design-page .primary-route,
+.pdf-design-page .financial {
+  padding: 12px;
+}
+.pdf-design-page .finding-grid > div,
+.pdf-design-page .priority-list section,
+.pdf-design-page .workflow-detail,
+.pdf-design-page .dependency-grid > div,
+.pdf-design-page .decision-box,
+.pdf-design-page .three-cards section,
+.pdf-design-page .timeline section {
+  padding: 11px;
+}
+.pdf-design-page .priority-list {
+  gap: 7px;
+}
+.pdf-design-page .priority-list section > span,
+.pdf-design-page .workflow-detail > header > span {
+  color: var(--pdf-accent);
+}
+.pdf-design-page .mechanism-chain {
+  gap: 6px;
+}
+.pdf-design-page .mechanism-chain > div {
+  min-height: 100px;
+  padding: 11px;
+}
+.pdf-design-page .mechanism-chain small,
+.pdf-design-page .os-bars strong,
+.pdf-design-page .os-bars span {
+  color: var(--pdf-accent);
+}
+.pdf-design-page .os-bars {
+  margin: 13px 0;
+  gap: 8px;
+}
+.pdf-design-page .pdf-flat-table {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #1b4564;
+  border-radius: 9px;
+  background: rgba(3, 16, 30, 0.88);
+  font-size: 9px;
+}
+.pdf-design-page .pdf-flat-row {
+  display: grid;
+  border-top: 1px solid #173a55;
+}
+.pdf-design-page .pdf-flat-row:first-child {
+  border-top: 0;
+}
+.pdf-design-page .pdf-flat-row > div {
+  min-width: 0;
+  padding: 8px;
+  color: #a9bdce;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.pdf-design-page .pdf-flat-head {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--pdf-accent) 24%, #0a1b30), #0b2038);
+  font-weight: 900;
+}
+.pdf-design-page .pdf-flat-head > div {
+  color: #fff;
+}
+.pdf-design-page .workflow-detail {
+  margin: 10px 0;
+}
+.pdf-design-page .workflow-assessment {
+  margin-top: 8px;
+}

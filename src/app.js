@@ -738,86 +738,89 @@ function safeFileName(value, fallback = "Vimigo report") {
   return (cleaned || fallback).slice(0, 100);
 }
 
-async function renderCompletePdf(report) {
-  const captureHeight = Math.ceil(report.scrollHeight);
-  const options = {
-    margin: [7, 7, 9, 7],
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-      logging: false,
-      height: captureHeight,
-      windowHeight: captureHeight,
-    },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    pagebreak: { mode: [] },
-  };
-  const reportTop = report.getBoundingClientRect().top;
-  const preferredBreaks = [...report.querySelectorAll(".pdf-page-break")].map(
-    (marker) => marker.getBoundingClientRect().top - reportTop,
-  );
-  const worker = window.html2pdf().set(options).from(report).toCanvas();
-  const canvas = await worker.get("canvas");
+function createDesignedPdfPage(reportNumber, title, subtitle, company, isCover) {
+  const page = document.createElement("section");
+  const accents = ["#20d6ea", "#8668ff", "#ffb52d", "#24d6b0", "#43a7ff", "#ff6f61"];
+  page.className = `pdf-design-page${isCover ? " pdf-design-cover" : ""}`;
+  page.dataset.report = reportNumber;
+  page.style.setProperty("--pdf-accent", accents[Number(reportNumber) - 1] || accents[0]);
+  page.innerHTML = `<header class="pdf-design-header"><div class="pdf-design-brand"><img src="https://vimigo.io/wp-content/uploads/2025/10/Logo.png" alt="Vimigo"><span>AI TRANSFORMATION DAY</span></div><div class="pdf-design-page-number"><strong>${reportNumber}</strong><span> / AI TRANSFORMATION REPORT</span></div></header>${isCover ? `<div class="pdf-design-title"><small>VIMIGO AI TRANSFORMATION DAY</small><h1>${esc(title)}</h1><p>${esc(subtitle)}</p><div><b>${esc(company)}</b><span>${state.language === "en" ? "90-day decision and execution report" : "90 天决策与执行报告"}</span></div></div>` : `<div class="pdf-design-section-label"><b>${esc(title)}</b><span>${esc(company)}</span></div>`}<main class="pdf-design-content"></main><footer class="pdf-design-footer"><span>${state.language === "en" ? "Prepared by Vimigo Customer Success Team" : "由 Vimigo 客户成功团队编制"}</span><span>${state.language === "en" ? "Confidential - CSM approval required" : "机密 - 必须经 CSM 批准"}</span><b data-pdf-page></b></footer>`;
+  return page;
+}
 
-  await worker.toPdf();
-  const pdf = await worker.get("pdf");
-  while (pdf.internal.getNumberOfPages() > 1) {
-    pdf.deletePage(pdf.internal.getNumberOfPages());
+function buildDesignedPdfPages(report, stage) {
+  const reportNumber = report.dataset.report;
+  const title = report.querySelector(".report-head h2")?.textContent || `Report ${reportNumber}`;
+  const subtitle = report.querySelector(".report-head p")?.textContent || "";
+  const company = state.pre.company || "Client company";
+  const groups = [[]];
+
+  [...report.children].forEach((child) => {
+    if (child.classList.contains("pdf-page-break")) {
+      if (groups.at(-1).length) groups.push([]);
+      return;
+    }
+    if (child.classList.contains("report-head") || child.classList.contains("report-footer")) return;
+    groups.at(-1).push(child);
+  });
+
+  const pages = [];
+  groups.filter((group) => group.length).forEach((group, groupIndex) => {
+    let page = createDesignedPdfPage(reportNumber, title, subtitle, company, groupIndex === 0);
+    stage.append(page);
+    pages.push(page);
+    let content = page.querySelector(".pdf-design-content");
+
+    group.forEach((node) => {
+      content.append(node);
+      if (content.scrollHeight > content.clientHeight && content.children.length > 1) {
+        node.remove();
+        page = createDesignedPdfPage(reportNumber, title, subtitle, company, false);
+        stage.append(page);
+        pages.push(page);
+        content = page.querySelector(".pdf-design-content");
+        content.append(node);
+      }
+    });
+  });
+
+  pages.forEach((page, index) => {
+    page.querySelector("[data-pdf-page]").textContent = `${String(index + 1).padStart(2, "0")} / ${String(pages.length).padStart(2, "0")}`;
+  });
+  return pages;
+}
+
+async function renderDesignedPdf(pages) {
+  let pdf;
+  for (let index = 0; index < pages.length; index += 1) {
+    const page = pages[index];
+    const worker = window.html2pdf().set({
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#03101e",
+        logging: false,
+        width: 760,
+        height: 1075,
+        windowWidth: 760,
+        windowHeight: 1075,
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: [] },
+    }).from(page).toCanvas();
+    const canvas = await worker.get("canvas");
+
+    if (!pdf) {
+      await worker.toPdf();
+      pdf = await worker.get("pdf");
+      while (pdf.internal.getNumberOfPages() > 1) pdf.deletePage(pdf.internal.getNumberOfPages());
+      pdf.setPage(1);
+    } else {
+      pdf.addPage();
+    }
+    pdf.addImage(canvas.toDataURL("image/jpeg", 0.98), "JPEG", 0, 0, 210, 297);
   }
-  pdf.setPage(1);
-  pdf.setFillColor(255, 255, 255);
-  pdf.rect(0, 0, 210, 297, "F");
-  const pageWidthMm = 210 - 14;
-  const pageHeightMm = 297 - 7 - 9;
-  const pageHeightPx = Math.floor(canvas.width * (pageHeightMm / pageWidthMm));
-  const pageCanvas = document.createElement("canvas");
-  pageCanvas.width = canvas.width;
-  pageCanvas.height = pageHeightPx;
-  const context = pageCanvas.getContext("2d");
-  const canvasScale = canvas.width / report.scrollWidth;
-  const canvasBreaks = preferredBreaks.map((offset) => offset * canvasScale);
-  let sourceY = 0;
-  let pageIndex = 0;
-
-  while (sourceY < canvas.height) {
-    const maximumEnd = Math.min(sourceY + pageHeightPx, canvas.height);
-    const preferredEnd = canvasBreaks
-      .filter(
-        (position) =>
-          position > sourceY + pageHeightPx * 0.35 && position <= maximumEnd,
-      )
-      .at(-1);
-    const sourceEnd = preferredEnd || maximumEnd;
-    const sourceHeight = sourceEnd - sourceY;
-    context.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-    context.drawImage(
-      canvas,
-      0,
-      sourceY,
-      canvas.width,
-      sourceHeight,
-      0,
-      0,
-      canvas.width,
-      sourceHeight,
-    );
-    if (pageIndex > 0) pdf.addPage();
-    pdf.addImage(
-      pageCanvas.toDataURL("image/jpeg", 0.98),
-      "JPEG",
-      7,
-      7,
-      pageWidthMm,
-      pageHeightMm,
-    );
-    sourceY = sourceEnd;
-    pageIndex += 1;
-  }
-
   return pdf.output("blob");
 }
 
@@ -890,15 +893,15 @@ async function downloadReportPdf(reportNumber, button) {
     );
 
     stage = document.createElement("div");
-    stage.className = "pdf-export-stage";
+    stage.className = "pdf-export-stage pdf-design-stage";
     const clone = report.cloneNode(true);
     clone.classList.add("pdf-export-report");
     clone.removeAttribute("id");
     clone.querySelectorAll("button").forEach((item) => item.remove());
     flattenPdfTables(clone);
-    stage.append(clone);
     document.body.append(stage);
-    const pdfBlob = await renderCompletePdf(clone);
+    const pages = buildDesignedPdfPages(clone, stage);
+    const pdfBlob = await renderDesignedPdf(pages);
 
     const downloadUrl = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
