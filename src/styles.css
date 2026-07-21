@@ -1290,7 +1290,7 @@ form {
   overflow: hidden;
   color: #f5f8ff;
   background:
-    radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--pdf-accent) 16%, transparent), transparent 26%),
+    radial-gradient(circle at 88% 8%, rgba(36, 211, 238, 0.14), transparent 26%),
     radial-gradient(circle at 8% 92%, rgba(28, 181, 232, 0.08), transparent 30%),
     linear-gradient(145deg, #061426 0%, #020a16 58%, #061222 100%);
   border: 1px solid #173450;
@@ -1485,7 +1485,7 @@ form {
   vertical-align: -3px;
   border-radius: 3px;
   background: var(--pdf-accent);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--pdf-accent) 55%, transparent);
+  box-shadow: 0 0 14px rgba(36, 211, 238, 0.38);
 }
 .pdf-design-page .score-hero {
   margin: 10px 0;
@@ -1566,7 +1566,7 @@ form {
   overflow-wrap: anywhere;
 }
 .pdf-design-page .pdf-flat-head {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--pdf-accent) 24%, #0a1b30), #0b2038);
+  background: linear-gradient(90deg, rgba(16, 87, 115, 0.92), #0b2038);
   font-weight: 900;
 }
 .pdf-design-page .pdf-flat-head > div {
