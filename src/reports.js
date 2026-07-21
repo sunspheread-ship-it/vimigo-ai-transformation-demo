@@ -253,6 +253,8 @@ function addReportPageBreaks(html, reportNumber) {
       "Six OS component detail",
       "六大 OS 评分明细",
       "Top three performance constraints",
+      "How Vimigo is expected to increase performance",
+      "Vimigo 如何提升绩效",
       "三大绩效限制",
       "Method, limitations and approval decisions",
       "方法、限制与批准事项",
@@ -275,6 +277,7 @@ function addReportPageBreaks(html, reportNumber) {
       "13-week operating rhythm",
       "13 周执行节奏",
       "Weekly management review agenda",
+      '<aside class="decision-box">',
       "每周管理复盘议程",
     ],
     "06": [

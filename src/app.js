@@ -4,7 +4,7 @@ import {
   getStage,
 } from "./scoring.js";
 import { initialState, osKeys } from "./sample-data.js";
-import { buildDetailedReports } from "./reports.js?v=20260720-5";
+import { buildDetailedReports } from "./reports.js?v=20260721-2";
 
 const STORAGE_KEY = "vimigo-transformation-demo-v2";
 let pdfDownloadInProgress = false;
@@ -744,7 +744,7 @@ function createDesignedPdfPage(reportNumber, title, subtitle, company, isCover) 
   page.className = `pdf-design-page${isCover ? " pdf-design-cover" : ""}`;
   page.dataset.report = reportNumber;
   page.style.setProperty("--pdf-accent", accents[Number(reportNumber) - 1] || accents[0]);
-  page.innerHTML = `<header class="pdf-design-header"><div class="pdf-design-brand"><img src="./assets/vimigo-logo.png" alt="Vimigo"><span>AI TRANSFORMATION DAY</span></div><div class="pdf-design-page-number"><strong>${reportNumber}</strong><span> / AI TRANSFORMATION REPORT</span></div></header>${isCover ? `<div class="pdf-design-title"><small>VIMIGO AI TRANSFORMATION DAY</small><h1>${esc(title)}</h1><p>${esc(subtitle)}</p><div><b>${esc(company)}</b><span>${state.language === "en" ? "90-day decision and execution report" : "90 天决策与执行报告"}</span></div></div>` : `<div class="pdf-design-section-label"><b>${esc(title)}</b><span>${esc(company)}</span></div>`}<main class="pdf-design-content"></main><footer class="pdf-design-footer"><span>${state.language === "en" ? "Prepared by Vimigo Customer Success Team" : "由 Vimigo 客户成功团队编制"}</span><span>${state.language === "en" ? "Confidential - CSM approval required" : "机密 - 必须经 CSM 批准"}</span><b data-pdf-page></b></footer>`;
+  page.innerHTML = `<main class="pdf-design-content">${isCover ? `<div class="pdf-design-title"><div class="pdf-design-cover-brand"><img src="./assets/vimigo-logo.png" alt="Vimigo"><span><strong>${reportNumber}</strong> / AI TRANSFORMATION REPORT</span></div><small>VIMIGO AI TRANSFORMATION DAY</small><h1>${esc(title)}</h1><p>${esc(subtitle)}</p><div class="pdf-design-company"><b>${esc(company)}</b><span>${state.language === "en" ? "90-day decision and execution report" : "90 天决策与执行报告"}</span></div></div>` : `<div class="pdf-design-section-label"><img src="./assets/vimigo-logo.png" alt="Vimigo"><b>${esc(title)}</b><span>${esc(company)}</span><strong>${reportNumber}</strong></div>`}</main><footer class="pdf-design-footer"><span>${state.language === "en" ? "Prepared by Vimigo Customer Success Team" : "由 Vimigo 客户成功团队编制"}</span><span>${state.language === "en" ? "Confidential - CSM approval required" : "机密 - 必须经 CSM 批准"}</span><b data-pdf-page></b></footer>`;
   return page;
 }
 
@@ -792,6 +792,8 @@ function buildDesignedPdfPages(report, stage) {
 
 async function renderDesignedPdf(pages) {
   let pdf;
+  const previousScroll = { x: window.scrollX, y: window.scrollY };
+  window.scrollTo(0, 0);
   const renderHost = document.createElement("div");
   renderHost.className = "pdf-single-page-stage";
   document.body.append(renderHost);
@@ -830,6 +832,7 @@ async function renderDesignedPdf(pages) {
     }
   } finally {
     renderHost.remove();
+    window.scrollTo(previousScroll.x, previousScroll.y);
   }
   return pdf.output("blob");
 }
@@ -882,6 +885,7 @@ async function downloadReportPdf(reportNumber, button) {
     if (!report) {
       throw new Error(`Report ${reportNumber} was not found.`);
     }
+    if (document.fonts?.ready) await document.fonts.ready;
 
     const downloadButtons = [...app.querySelectorAll("[data-download-report]")];
     downloadButtons.forEach((item) => {

@@ -3,6 +3,7 @@ import { mkdir, readdir } from "node:fs/promises";
 const port = Number(process.argv[2] || 9223);
 const outputDir = process.argv[3];
 const targetUrl = process.argv[4] || "https://sunspheread-ship-it.github.io/vimigo-ai-transformation-demo/?qa=pdf";
+const reportNumbers = (process.argv[5] || "01,02,03,04,05,06").split(",");
 if (!outputDir) throw new Error("Usage: node test/download-pdfs-cdp.mjs <port> <output-dir>");
 
 await mkdir(outputDir, { recursive: true });
@@ -83,7 +84,7 @@ await sleep(500);
 await evaluate("document.querySelector('[data-step=reports]').click(); true");
 await sleep(500);
 
-for (const reportNumber of ["01", "02", "03", "04", "05", "06"]) {
+for (const reportNumber of reportNumbers) {
   const before = (await readdir(outputDir)).filter((name) => name.toLowerCase().endsWith(".pdf")).length;
   await evaluate(`document.querySelector('[data-download-report="${reportNumber}"]').click(); true`);
   let completed = false;

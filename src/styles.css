@@ -1281,7 +1281,7 @@ form {
   background: transparent;
 }
 .pdf-single-page-stage {
-  position: fixed;
+  position: absolute;
   inset: 0 auto auto 0;
   z-index: -1;
   width: 760px;
@@ -1290,7 +1290,6 @@ form {
   pointer-events: none;
 }
 .pdf-design-page {
-  position: relative;
   width: 760px;
   height: 1075px;
   box-sizing: border-box;
@@ -1308,12 +1307,7 @@ form {
   line-height: 1.35;
 }
 .pdf-design-header {
-  position: absolute;
-  z-index: 5;
-  top: 22px;
-  left: 26px;
-  right: 26px;
-  height: 34px;
+  flex: 0 0 34px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1345,8 +1339,30 @@ form {
 }
 .pdf-design-title {
   flex: 0 0 auto;
-  margin-top: 44px;
-  padding: 22px 0 16px;
+  padding: 0 0 16px;
+}
+.pdf-design-cover-brand {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid #183750 !important;
+  background: transparent !important;
+}
+.pdf-design-cover-brand img {
+  width: 105px;
+  height: auto;
+}
+.pdf-design-cover-brand span {
+  color: #7f9ab2;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.pdf-design-cover-brand strong {
+  color: #fff;
+  font-size: 20px;
 }
 .pdf-design-title > small {
   color: var(--pdf-accent);
@@ -1367,7 +1383,7 @@ form {
   font-size: 14px;
   font-weight: 800;
 }
-.pdf-design-title > div {
+.pdf-design-title > .pdf-design-company {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1377,23 +1393,26 @@ form {
   border-radius: 9px;
   background: rgba(5, 24, 42, 0.86);
 }
-.pdf-design-title > div b {
+.pdf-design-title > .pdf-design-company b {
   color: #fff;
   font-size: 14px;
 }
-.pdf-design-title > div span {
+.pdf-design-title > .pdf-design-company span {
   color: #8eabc2;
   font-size: 9px;
 }
 .pdf-design-section-label {
   flex: 0 0 auto;
-  margin-top: 44px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 16px;
   padding: 12px 0 10px;
   border-bottom: 1px solid #183750;
+}
+.pdf-design-section-label img {
+  width: 82px;
+  height: auto;
 }
 .pdf-design-section-label b {
   color: var(--pdf-accent);
@@ -1403,19 +1422,18 @@ form {
   color: #7894ab;
   font-size: 9px;
 }
+.pdf-design-section-label > strong {
+  color: var(--pdf-accent);
+  font-size: 18px;
+}
 .pdf-design-content {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  padding: 6px 0 32px;
+  padding-top: 6px;
 }
 .pdf-design-footer {
-  position: absolute;
-  z-index: 5;
-  right: 26px;
-  bottom: 18px;
-  left: 26px;
-  height: 22px;
+  flex: 0 0 22px;
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   align-items: end;
