@@ -1281,13 +1281,18 @@ form {
   background: transparent;
 }
 .pdf-single-page-stage {
-  position: absolute;
-  inset: 0 auto auto 0;
-  z-index: -1;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: -2147483647;
   width: 760px;
   height: 1075px;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   pointer-events: none;
+  transform: none;
+  zoom: 1;
 }
 .pdf-design-page {
   width: 760px;

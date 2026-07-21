@@ -791,9 +791,14 @@ function buildDesignedPdfPages(report, stage) {
 }
 
 async function renderDesignedPdf(pages) {
-  let pdf;
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    unit: "mm",
+    format: "a4",
+    orientation: "portrait",
+    compress: true,
+  });
   const previousScroll = { x: window.scrollX, y: window.scrollY };
-  window.scrollTo(0, 0);
   const renderHost = document.createElement("div");
   renderHost.className = "pdf-single-page-stage";
   document.body.append(renderHost);
@@ -801,34 +806,64 @@ async function renderDesignedPdf(pages) {
     for (let index = 0; index < pages.length; index += 1) {
       const page = pages[index];
       renderHost.replaceChildren(page);
-      const worker = window.html2pdf().set({
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#03101e",
-          logging: false,
-          width: 760,
-          height: 1075,
-          windowWidth: 760,
-          windowHeight: 1075,
-          scrollX: 0,
-          scrollY: 0,
-        },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: [] },
-      }).from(page).toCanvas();
-      const canvas = await worker.get("canvas");
+      page.style.width = "760px";
+      page.style.height = "1075px";
+      page.style.margin = "0";
+      page.style.transform = "none";
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      if (!pdf) {
-        await worker.toPdf();
-        pdf = await worker.get("pdf");
-        while (pdf.internal.getNumberOfPages() > 1) pdf.deletePage(pdf.internal.getNumberOfPages());
-        pdf.setPage(1);
-      } else {
-        pdf.addPage();
-      }
-      pdf.addImage(canvas.toDataURL("image/jpeg", 0.98), "JPEG", 0, 0, 210, 297);
+      const capturedCanvas = await window.html2canvas(page, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#03101e",
+        logging: false,
+        width: 760,
+        height: 1075,
+        windowWidth: 760,
+        windowHeight: 1075,
+        scrollX: 0,
+        scrollY: 0,
+        onclone: (clonedDocument) => {
+          const clonedPage = clonedDocument.querySelector(".pdf-single-page-stage .pdf-design-page");
+          if (clonedPage) {
+            clonedPage.style.position = "relative";
+            clonedPage.style.inset = "auto";
+            clonedPage.style.margin = "0";
+            clonedPage.style.transform = "none";
+          }
+        },
+      });
+
+      const normalizedCanvas = document.createElement("canvas");
+      normalizedCanvas.width = 1520;
+      normalizedCanvas.height = 2150;
+      const context = normalizedCanvas.getContext("2d");
+      context.fillStyle = "#03101e";
+      context.fillRect(0, 0, normalizedCanvas.width, normalizedCanvas.height);
+      context.drawImage(
+        capturedCanvas,
+        0,
+        0,
+        capturedCanvas.width,
+        capturedCanvas.height,
+        0,
+        0,
+        normalizedCanvas.width,
+        normalizedCanvas.height,
+      );
+
+      if (index > 0) pdf.addPage("a4", "portrait");
+      pdf.addImage(
+        normalizedCanvas.toDataURL("image/jpeg", 0.96),
+        "JPEG",
+        0,
+        0,
+        210,
+        297,
+        undefined,
+        "FAST",
+      );
     }
   } finally {
     renderHost.remove();
@@ -877,7 +912,7 @@ async function downloadReportPdf(reportNumber, button) {
   };
 
   try {
-    if (!window.html2pdf) {
+    if (!window.html2canvas || !window.jspdf?.jsPDF) {
       throw new Error("The PDF generator did not load. Please refresh and try again.");
     }
 
@@ -920,14 +955,14 @@ async function downloadReportPdf(reportNumber, button) {
     const downloadUrl = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
     link.href = downloadUrl;
-    link.download = `${reportNumber} - ${title} - ${company}.pdf`;
+    link.download = `${reportNumber} - ${title} - ${company} - v0.2.pdf`;
     document.body.append(link);
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
     setStatus(
       state.language === "en"
-        ? `Complete: Report ${reportNumber} downloaded as a PDF.`
+        ? `Complete: Report ${reportNumber} downloaded as PDF v0.2.`
         : `完成：报告 ${reportNumber} 已下载为 PDF。`,
     );
   } catch (error) {

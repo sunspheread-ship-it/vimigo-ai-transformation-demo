@@ -91,6 +91,10 @@ for (const reportNumber of reportNumbers) {
   for (let attempt = 0; attempt < 180; attempt += 1) {
     await sleep(500);
     const files = (await readdir(outputDir)).filter((name) => name.toLowerCase().endsWith(".pdf"));
+    if (attempt > 0 && attempt % 20 === 0) {
+      const progress = await evaluate("document.querySelector('[data-download-status]')?.textContent || 'No PDF status'");
+      process.stdout.write(`Report ${reportNumber}: ${progress}\n`);
+    }
     const failed = await evaluate("document.querySelector('[data-download-status]')?.textContent?.startsWith('Download failed:') || false");
     if (failed) throw new Error(await evaluate("document.querySelector('[data-download-status]').textContent"));
     if (files.length > before) {

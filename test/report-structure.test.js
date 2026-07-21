@@ -78,7 +78,7 @@ test("report pack offers six direct PDF download buttons without ZIP or print", 
   assert.match(reportsSource, /no ZIP file and no print screen/);
   assert.match(appSource, /downloadReportPdf\(reportNumber, button\)/);
   assert.match(appSource, /pdf\.output\("blob"\)/);
-  assert.match(appSource, /link\.download = `\$\{reportNumber\} - \$\{title\} - \$\{company\}\.pdf`/);
+  assert.match(appSource, /link\.download = `\$\{reportNumber\} - \$\{title\} - \$\{company\} - v0\.2\.pdf`/);
   assert.doesNotMatch(reportsSource, /data-download-all|\.zip/);
   assert.doesNotMatch(appSource, /window\.print\(\)|window\.JSZip/);
 });
@@ -93,9 +93,14 @@ test("PDF generation is globally queued and protects page-break content", () => 
   assert.match(appSource, /async function renderDesignedPdf/);
   assert.match(appSource, /pdf-single-page-stage/);
   assert.match(appSource, /function flattenPdfTables/);
-  assert.match(appSource, /pdf\.deletePage\(/);
+  assert.match(appSource, /const \{ jsPDF \} = window\.jspdf/);
+  assert.match(appSource, /new jsPDF\(/);
+  assert.match(appSource, /window\.html2canvas\(page/);
+  assert.match(appSource, /normalizedCanvas\.width = 1520/);
+  assert.match(appSource, /normalizedCanvas\.height = 2150/);
   assert.match(stylesSource, /\.pdf-design-page\s*\{[^}]*width:\s*760px[^}]*height:\s*1075px/s);
-  assert.match(appSource, /pagebreak:\s*\{\s*mode:\s*\[\]\s*\}/);
+  assert.doesNotMatch(appSource, /window\.html2pdf/);
+  assert.doesNotMatch(appSource, /pdf\.deletePage\(/);
 });
 
 test("report page exposes only the six primary PDF download controls", () => {
