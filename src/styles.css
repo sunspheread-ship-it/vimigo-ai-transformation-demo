@@ -1280,6 +1280,15 @@ form {
   width: 760px;
   background: transparent;
 }
+.pdf-single-page-stage {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: -1;
+  width: 760px;
+  height: 1075px;
+  overflow: hidden;
+  pointer-events: none;
+}
 .pdf-design-page {
   width: 760px;
   height: 1075px;

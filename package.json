@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test",
+    "test": "node --test test/*.test.js",
     "check": "node --check src/app.js && node --check src/scoring.js",
     "serve": "python -m http.server 4173"
   }

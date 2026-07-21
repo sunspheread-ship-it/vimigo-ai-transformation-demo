@@ -62,8 +62,8 @@ test("diagnostic ratings do not ask for repeated evidence notes or sources", () 
   assert.doesNotMatch(reportsSource, /Evidence note|Evidence confidence/);
 });
 
-test("header uses the official Vimigo website logo asset", () => {
-  assert.match(appSource, /vimigo\.io\/wp-content\/uploads\/2025\/10\/Logo\.png/);
+test("header and PDFs use the locally embedded official Vimigo logo", () => {
+  assert.match(appSource, /\.\/assets\/vimigo-logo\.png/);
   assert.match(appSource, /alt="Vimigo"/);
 });
 
@@ -91,6 +91,7 @@ test("PDF generation is globally queued and protects page-break content", () => 
   assert.match(reportsSource, /class="pdf-page-break"/);
   assert.match(appSource, /function buildDesignedPdfPages/);
   assert.match(appSource, /async function renderDesignedPdf/);
+  assert.match(appSource, /pdf-single-page-stage/);
   assert.match(appSource, /function flattenPdfTables/);
   assert.match(appSource, /pdf\.deletePage\(/);
   assert.match(stylesSource, /\.pdf-design-page\s*\{[^}]*width:\s*760px[^}]*height:\s*1075px/s);
